@@ -173,23 +173,32 @@ export const UserUpdate = async (req: CustomRequest, res: Response): Promise<any
     try {
         const { name, contact, address, country } = req.body
         const UserUpdate = { name, contact, address, country }
-        const UserId = req.user?.id
+        const UserId = req.params?.id
         const user = await UserModels.findById(UserId)
+
         if (!user) {
             return res.status(400).json({ message: "User Not Found..." })
         }
 
+        if (contact) {
+            const contactcheck = await UserModels.findOne({ contact: contact })
+            if (contactcheck) {
+                if (!(contactcheck?.contact == user.contact)) {
+                    return res.status(400).json({ message: "Mobile number already exists" });
+                }
+            }
+        }
         // if (req.files && user) {
         //     user.profilePictuer = req.files;
         // }
 
         if (!name) UserUpdate.name = user.name
-        if (!contact) UserUpdate.contact = user.contact
         if (!address) UserUpdate.address = user.address
         if (!country) UserUpdate.country = user.country
 
         const User = await UserModels.findByIdAndUpdate(UserId, UserUpdate, { new: true });
-        return res.status(200).json(user);
+
+        return res.status(200).json(User);
     } catch (error) {
         console.log(error);
         return res.status(501).json({ message: "Internal Server Error.." })
