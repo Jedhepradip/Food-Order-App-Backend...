@@ -1,0 +1,14 @@
+npm init -y
+npm install typescript @types/node --save-dev
+npm install express
+npm install @types/express --save-dev
+npx tsc --init
+mkdir src
+touch src/index.ts
+"scripts": {
+  "start": "node dist/index.js",
+  "build": "tsc",
+  "dev": "ts-node-dev src/index.ts"
+}
+npm install ts-node-dev --save-dev
+npm run dev
