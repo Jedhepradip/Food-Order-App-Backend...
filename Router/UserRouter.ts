@@ -1,5 +1,5 @@
-import express, { Router, Request, Response } from "express";
-const router = Router();
+import express from "express";
+const router = express.Router();
 import { SendOTPForRegistrationUser, RegistrationUser, LoginUser, UserUpdate, ForgetPassword, PasswordReset } from "../Controllers/UserControllers";
 
 router.post("/SendOTP/ForRegistration/User", SendOTPForRegistrationUser);

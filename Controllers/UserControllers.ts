@@ -3,7 +3,6 @@ import UserModels from "../Models/UserModels";
 import nodemailer from "nodemailer"
 import bcrypt from "bcrypt"
 import { generateToken } from "../Middewares/generateToken"
-import mongoose from "mongoose";
 import crypto from "crypto"
 
 interface CustomRequest extends Request {
