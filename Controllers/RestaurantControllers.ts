@@ -14,6 +14,12 @@ export const RestaurantCreate = async (req: CustomRequest, res: Response): Promi
         const { restaurantName, city, country, deliveryTime, cuisines } = req.body;
         const userId = req.user?.id; // Assuming req.user is populated with user info after authentication
 
+        if (!restaurantName || !city || !country || !deliveryTime || !cuisines) {
+            return res.status(400).json({
+                message: "Oops! It looks like some details are missing.😊"
+            });
+        }
+
         // Check if the user has already created a restaurant
         const existingRestaurant = await Restaurant.findOne({ user: userId });
         if (existingRestaurant) {

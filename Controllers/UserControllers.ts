@@ -95,8 +95,11 @@ export const SendOTPForRegistrationUser = async (req: Request, res: Response): P
 export const RegistrationUser = async (req: Request, res: Response): Promise<any> => {
     try {
         const { name, email, contact, password } = req.body;
+
         if (!name || !email || !contact || !password) {
-            return res.status(400).json({ message: "all filed is the required..." })
+            return res.status(400).json({
+                message: "Oops! It looks like some details are missing.😊"
+            });
         }
 
         const emailcheck = await UserModels.findOne({ email: email })

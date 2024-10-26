@@ -43,7 +43,7 @@ const RestaurantSchema: mongoose.Schema<RestaurantInterface> = new mongoose.Sche
     }],
     menus: [{ // Changed to an array
         type: mongoose.Schema.Types.ObjectId,
-        ref: "menu", // Make sure the ref matches your actual Menu model name        
+        ref: "meun", // Make sure the ref matches your actual Menu model name        
     }]
 });
 
