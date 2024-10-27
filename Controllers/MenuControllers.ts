@@ -59,13 +59,26 @@ export const GetMenuData = async (req: Request, res: Response): Promise<any> => 
     try {
         const RestaurantId = req.params.id
         const menu = await Restaurant.findById(RestaurantId).populate({ path: "menus" })
-        console.log("menu :", menu);
         if (!menu) {
             return res.status(400).json({ message: "Menu not fount..." })
         }
-
         return res.status(200).json(menu)
+    } catch (error) {
+        console.log(error);
+        return res.status(501).json({ message: "Internal Server Error..." })
+    }
+}
 
+//Get the data to create the login user menu to show the frontend
+export const GetLoginUser = async (req: CustomRequest, res: Response): Promise<any> => {
+    try {
+        const UserId = req.user?.id
+        console.log(UserId);
+        const Restaurantdata = await Restaurant.findOne({ user: UserId }).populate({ path: "menus" });
+        if (!Restaurantdata) {
+            return res.status(400).json({ message: "Not Created the Any Restaurant Menus..." })
+        }
+        return res.status(200).json(Restaurantdata)
     } catch (error) {
         console.log(error);
         return res.status(501).json({ message: "Internal Server Error..." })
