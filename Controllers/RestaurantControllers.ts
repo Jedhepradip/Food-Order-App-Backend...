@@ -31,7 +31,7 @@ export const RestaurantCreate = async (req: CustomRequest, res: Response): Promi
             city,
             country,
             deliveryTime,
-            cuisines,
+            cuisines: JSON.parse(cuisines),
             user: userId, // user is now set as a single ObjectId
             imageUrl: "pp"
         });
@@ -93,6 +93,7 @@ export const RestaurantUpdate = async (req: Request, res: Response): Promise<any
         // if(!req.files){
         //     RestaurantFind.imageUrl = req.files
         // }
+        RestaurantReq
 
         if (!restaurantName) RestaurantReq.restaurantName = RestaurantFind.restaurantName
         if (!deliveryTime) RestaurantReq.deliveryTime = RestaurantFind.deliveryTime
