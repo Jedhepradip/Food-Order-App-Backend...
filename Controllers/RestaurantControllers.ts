@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express"
 import Restaurant from "../Models/Restaurant";
+import Order from "../Models/Order";
 
 interface CustomRequest extends Request {
     user?: {
@@ -104,6 +105,41 @@ export const RestaurantUpdate = async (req: Request, res: Response): Promise<any
         const RestaurantData = await Restaurant.findByIdAndUpdate(RestaurantId, RestaurantReq, { new: true });
         return res.status(200).json({ message: "Restaurant Updated Successfully...", RestaurantData })
 
+    } catch (error) {
+        console.log(error);
+        return res.status(501).json({ message: "Internal Server Error..." })
+    }
+}
+
+// Get Order Data
+export const GetRestaurantOrder = async (req: CustomRequest, res: Response): Promise<any> => {
+    try {
+        const Restaurantdata = await Restaurant.findOne({ user: req.user?.id });
+        if (!Restaurantdata) {
+            return res.status(400).json({ message: "Restaurant Not Found..." })
+        }
+        const order = await Order.find({ restaurant: Restaurantdata._id }).populate("restaurant").populate("UserModel")
+        if (!order) {
+            return res.status(400).json({ message: "Order Not Found..." })
+        }
+        return res.status(200).json(order)
+    } catch (error) {
+        console.log(error);
+        return res.status(501).json({ message: "Internal Server Error..." })
+    }
+}
+
+export const statusUpdate = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const OrderId = req.params.id
+        const { status } = req.body
+        const order = await Order.findById(OrderId)
+        if (!order) {
+            return res.status(400).json({ message: "Order Not Found..." })
+        }
+        order.status = status
+        await order.save()
+        return res.status(200).json({ message: "Order Status Update..." })
     } catch (error) {
         console.log(error);
         return res.status(501).json({ message: "Internal Server Error..." })
