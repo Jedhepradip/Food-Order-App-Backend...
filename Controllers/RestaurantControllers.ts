@@ -1,6 +1,5 @@
 import express, { Request, Response } from "express"
 import Restaurant from "../Models/Restaurant";
-import UserModels from "../Models/UserModels";
 
 interface CustomRequest extends Request {
     user?: {
