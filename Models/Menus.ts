@@ -31,4 +31,4 @@ const MenuSchema: mongoose.Schema<menu> = new mongoose.Schema({
     }
 })
 
-export default mongoose.model("meun", MenuSchema)
+export default mongoose.model<menu>("meun", MenuSchema)
