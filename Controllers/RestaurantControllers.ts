@@ -129,6 +129,7 @@ export const GetRestaurantOrder = async (req: CustomRequest, res: Response): Pro
     }
 }
 
+//Status Update
 export const statusUpdate = async (req: Request, res: Response): Promise<any> => {
     try {
         const OrderId = req.params.id

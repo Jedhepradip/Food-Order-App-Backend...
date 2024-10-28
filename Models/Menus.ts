@@ -29,6 +29,6 @@ const MenuSchema: mongoose.Schema<menu> = new mongoose.Schema({
         type: String,
         required: true,
     }
-})
+}, { timestamps: true })
 
 export default mongoose.model<menu>("meun", MenuSchema)

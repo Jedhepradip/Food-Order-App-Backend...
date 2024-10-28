@@ -45,6 +45,6 @@ const RestaurantSchema: mongoose.Schema<RestaurantInterface> = new mongoose.Sche
         type: mongoose.Schema.Types.ObjectId,
         ref: "meun", // Make sure the ref matches your actual Menu model name        
     }]
-});
+},{timestamps:true});
 
 export default mongoose.model<RestaurantInterface>("Restaurant", RestaurantSchema); // Exporting with singular model name

@@ -49,6 +49,6 @@ const UserData: mongoose.Schema<UserModelInterfase> = new mongoose.Schema({
     resetTokenExpiration: {
         type: Number
     },
-})
+},{timestamps:true})
 
 export default mongoose.model("UserModel", UserData)
