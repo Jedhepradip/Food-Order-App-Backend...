@@ -21,6 +21,7 @@ interface UserPayload {
 export const SendOTPForRegistrationUser = async (req: Request, res: Response): Promise<any> => {
     try {
         const { email, contact, name } = req.body;
+
         if (!email || !contact || !name) {
             return res.status(400).json({ message: 'All fields are required' });
         }
@@ -94,9 +95,13 @@ export const SendOTPForRegistrationUser = async (req: Request, res: Response): P
 // Ensure similar changes for other handlers
 export const RegistrationUser = async (req: Request, res: Response): Promise<any> => {
     try {
-        const { name, email, contact, password } = req.body;
+        const { name, email, contact, password, address, country, city } = req.body;
+        
+        if (!req.file) {
+            return res.status(400).json({ message: "Profile Pictuer are missing.😊" })
+        }
 
-        if (!name || !email || !contact || !password) {
+        if (!name || !email || !contact || !password || !contact || !address || !country || !city) {
             return res.status(400).json({
                 message: "Oops! It looks like some details are missing.😊"
             });
@@ -118,7 +123,11 @@ export const RegistrationUser = async (req: Request, res: Response): Promise<any
             name,
             email,
             contact,
+            address,
+            country,
+            city,
             password: passwordhash,
+            profilePictuer: req.file.originalname,
         })
         await UserData.save()
 
