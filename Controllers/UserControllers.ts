@@ -21,18 +21,19 @@ interface UserPayload {
 export const SendOTPForRegistrationUser = async (req: Request, res: Response): Promise<any> => {
     try {
         const { email, contact, name } = req.body;
+        console.log(req.body);
 
         if (!email || !contact || !name) {
             return res.status(400).json({ message: 'All fields are required' });
         }
         const emailCheck = await UserModels.findOne({ email });
         if (emailCheck) {
-            res.status(400).json({ message: "User already exists with this email." });
+            return res.status(400).json({ message: "User already exists with this email." });
         }
 
         const contactCheck = await UserModels.findOne({ contact });
         if (contactCheck) {
-            res.status(400).json({ message: "User already exists with this contact." });
+            return res.status(400).json({ message: "User already exists with this contact." });
         }
 
         // Set up the email transporter
@@ -52,16 +53,16 @@ export const SendOTPForRegistrationUser = async (req: Request, res: Response): P
         const info = await transporter.sendMail({
             from: process.env.FROM,
             to: email, // Send the email to the user
-            subject: "Welcome to [Your Food Order Website]!", // Subject line
-            text: `Thank you for registering at [Your Food Order Website]. Your OTP code is ${otpCode}. It is valid for 10 minutes.`, // Fallback text
+            subject: "Welcome to JedheEats!", // Subject line
+            text: `Thank you for registering at JedheEats. Your OTP code is ${otpCode}. It is valid for 10 minutes.`, // Fallback text
             html: `
                 <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-                    <h2 style="color: black; text-align:center;">Welcome to [Your Food Order Website]!</h2>
+                    <h2 style="color: black; text-align:center;">Welcome to JedheEats!</h2>
                     <p>Hi ${name},</p>
-                    <p>Thank you for registering at [Your Food Order Website]. We're excited to have you on board!</p>
+                    <p>Thank you for registering at JedheEats. We're excited to have you on board!</p>
         
                     <h3 style="margin-top: 30px; color: #333;">Your OTP Code:</h3>
-                    <div style="background-color: #f4f4f4; padding: 10px 20px; border-radius: 8px; font-size: 24px; text-align: center; max-width: 400px; margin: auto; font-weight: bold; color: #007bff;">
+                    <div style="background-color: #f4f4f4; padding: 10px 20px; border-radius: 8px; font-size: 24px; text-align: center; max-width: 400px; margin: auto; font-weight: bold; color: black;">
                         ${otpCode}
                     </div>
         
@@ -77,18 +78,18 @@ export const SendOTPForRegistrationUser = async (req: Request, res: Response): P
                     
                     <p style="margin-top: 30px;">We're here to help you with your food orders! Feel free to explore our menu and place your first order.</p>
                     
-                    <p>Best regards,<br/> The [Your Food Order Website] Team</p>
+                    <p>Best regards,<br/> The JedheEats Team</p>
                     
                     <p style="font-size: 12px; color: #888; margin-top: 20px;">If you have any questions, please contact us at support@yourcompany.com.</p>
                 </div>
             `,
         });
         // Optionally, you can also store the OTP code in your database or log it for later verification.                
-        res.status(200).json({ message: "OTP sent successfully Check Your Email... ", otpCode });
+        return res.status(200).json({ message: "OTP sent successfully Check Your Email... ", otpCode });
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Internal Server Error." });
+        return res.status(500).json({ message: "Internal Server Error." });
     }
 };
 
@@ -96,7 +97,7 @@ export const SendOTPForRegistrationUser = async (req: Request, res: Response): P
 export const RegistrationUser = async (req: Request, res: Response): Promise<any> => {
     try {
         const { name, email, contact, password, address, country, city } = req.body;
-        
+
         if (!req.file) {
             return res.status(400).json({ message: "Profile Pictuer are missing.😊" })
         }
