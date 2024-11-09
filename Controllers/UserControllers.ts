@@ -218,6 +218,19 @@ export const UserUpdate = async (req: CustomRequest, res: Response): Promise<any
     }
 }
 
+export const GetLoginUserdata = async (req: CustomRequest, res: Response): Promise<any> => {
+    try {
+        const Userdata = await UserModels.findById(req.user?.id)
+        if (!UserUpdate) {
+            return res.status(401).json({ message: "User Not Found..." })
+        }
+        return res.status(200).json(Userdata)
+    } catch (error) {
+        console.log(error);
+        return res.status(501).json({ message: "Internal Server Error.." })
+    }
+}
+
 export const ForgetPassword = async (req: Request, res: Response): Promise<any> => {
     try {
         const { email } = req.body
