@@ -14,10 +14,19 @@ export const RestaurantCreate = async (req: CustomRequest, res: Response): Promi
         const { restaurantName, city, country, deliveryTime, cuisines } = req.body;
         const userId = req.user?.id; // Assuming req.user is populated with user info after authentication
 
+        console.log(req.body);
+
         if (!restaurantName || !city || !country || !deliveryTime || !cuisines) {
             return res.status(400).json({
                 message: "Oops! It looks like some details are missing.😊"
             });
+        }
+
+        console.log("req.file.originalname", req.file?.originalname);
+
+
+        if (!req.file) {
+            return res.status(400).json({ message: "Restaurant Banner are missing.😊" })
         }
 
         // Check if the user has already created a restaurant
@@ -26,22 +35,23 @@ export const RestaurantCreate = async (req: CustomRequest, res: Response): Promi
             return res.status(400).json({ message: "You have already created a restaurant." });
         }
 
+        console.log(JSON.parse(cuisines));
+
         // Create the new restaurant with the userId as a reference
         const newRestaurant = new Restaurant({
             restaurantName,
             city,
             country,
             deliveryTime,
-            cuisines: JSON.parse(cuisines),
+            cuisines: cuisines,
             user: userId, // user is now set as a single ObjectId
-            imageUrl: "pp"
+            RestaurantBanner: req.file?.originalname
         });
 
         await newRestaurant.save();
 
         return res.status(200).json({
-            message: "Restaurant created successfully",
-            restaurant: newRestaurant,
+            message: "Restaurant created successfully"
         });
 
     } catch (error) {

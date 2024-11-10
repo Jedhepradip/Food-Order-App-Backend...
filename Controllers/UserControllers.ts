@@ -200,8 +200,18 @@ export const UserUpdate = async (req: CustomRequest, res: Response): Promise<any
                 }
             }
         }
-        // if (req.files && user) {
-        //     user.profilePictuer = req.files;
+
+        // type Files = {
+        //     [fieldname: string]: MulterFile[];
+        // }
+
+        // if (req.files && (req.files as Files)) {
+        //     // const result2 = await cloudinary.uploader.upload((req.files as Files)?.ProfileImg[0].path);
+        //     // reqbody.ProfileImg = result2.secure_url
+        //     UserUpdate.profilePictuer = req.file?.originalname[0]
+
+        // } else {
+        //     UserUpdate.profilePictuer = user?.profilePictuer
         // }
 
         if (!name) UserUpdate.name = user.name
@@ -210,7 +220,10 @@ export const UserUpdate = async (req: CustomRequest, res: Response): Promise<any
 
         const User = await UserModels.findByIdAndUpdate(UserId, UserUpdate, { new: true });
 
-        return res.status(200).json(User);
+        console.log("Update User", User);
+
+        return res.status(200).json({ message: "Profile Update Successfully..." });
+
     } catch (error) {
         console.log(error);
         return res.status(501).json({ message: "Internal Server Error.." })
