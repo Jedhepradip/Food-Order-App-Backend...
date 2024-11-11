@@ -22,9 +22,6 @@ export const RestaurantCreate = async (req: CustomRequest, res: Response): Promi
             });
         }
 
-        console.log("req.file.originalname", req.file?.originalname);
-
-
         if (!req.file) {
             return res.status(400).json({ message: "Restaurant Banner are missing.😊" })
         }
@@ -35,15 +32,13 @@ export const RestaurantCreate = async (req: CustomRequest, res: Response): Promi
             return res.status(400).json({ message: "You have already created a restaurant." });
         }
 
-        console.log(JSON.parse(cuisines));
-
         // Create the new restaurant with the userId as a reference
         const newRestaurant = new Restaurant({
             restaurantName,
             city,
             country,
             deliveryTime,
-            cuisines: cuisines,
+            cuisines: cuisines.split(" "),
             user: userId, // user is now set as a single ObjectId
             RestaurantBanner: req.file?.originalname
         });
@@ -97,6 +92,11 @@ export const RestaurantUpdate = async (req: Request, res: Response): Promise<any
         const { restaurantName, city, country, deliveryTime, cuisines } = req.body;
         const RestaurantReq = { restaurantName, city, country, deliveryTime, cuisines }
         const RestaurantFind = await Restaurant.findById(RestaurantId)
+
+        console.log(req.body);
+        console.log(req.file);
+        
+
         if (!RestaurantFind) {
             return res.status(400).json({ message: "Restaurant Not Found..." })
         }
@@ -104,6 +104,7 @@ export const RestaurantUpdate = async (req: Request, res: Response): Promise<any
         // if(!req.files){
         //     RestaurantFind.imageUrl = req.files
         // }
+        
         RestaurantReq
 
         if (!restaurantName) RestaurantReq.restaurantName = RestaurantFind.restaurantName

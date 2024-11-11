@@ -5,7 +5,7 @@ interface RestaurantInterface {
     city: string;
     country: string;
     deliveryTime: string;
-    cuisines: string;
+    cuisines: string[];
     RestaurantBanner: string;
     user: mongoose.Schema.Types.ObjectId[]; // This indicates it's an array
     menus: mongoose.Schema.Types.ObjectId[]; // This indicates it's an array
@@ -29,7 +29,7 @@ const RestaurantSchema: mongoose.Schema<RestaurantInterface> = new mongoose.Sche
         required: true,
     },
     cuisines: {
-        type: String,
+        type: [String],
         required: true,
     },
     RestaurantBanner: { // Fixed the spelling error here
