@@ -89,23 +89,19 @@ export const GetAllRestaurantData = async (req: Request, res: Response): Promise
 export const RestaurantUpdate = async (req: Request, res: Response): Promise<any> => {
     try {
         const RestaurantId = req.params?.id
-        const { restaurantName, city, country, deliveryTime, cuisines } = req.body;
-        const RestaurantReq = { restaurantName, city, country, deliveryTime, cuisines }
+        const { restaurantName, city, country, deliveryTime, cuisines, RestaurantBanner } = req.body;
+        const RestaurantReq = { restaurantName, city, country, deliveryTime, cuisines, RestaurantBanner }
         const RestaurantFind = await Restaurant.findById(RestaurantId)
-
-        console.log(req.body);
-        console.log(req.file);
-        
 
         if (!RestaurantFind) {
             return res.status(400).json({ message: "Restaurant Not Found..." })
         }
-
-        // if(!req.files){
-        //     RestaurantFind.imageUrl = req.files
-        // }
-        
-        RestaurantReq
+      
+        if (req.file) {
+            RestaurantReq.RestaurantBanner = req.file?.originalname;
+        } else {
+            RestaurantReq.RestaurantBanner = RestaurantFind?.RestaurantBanner;
+        }
 
         if (!restaurantName) RestaurantReq.restaurantName = RestaurantFind.restaurantName
         if (!deliveryTime) RestaurantReq.deliveryTime = RestaurantFind.deliveryTime

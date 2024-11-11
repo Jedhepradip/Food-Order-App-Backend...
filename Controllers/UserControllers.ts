@@ -183,8 +183,8 @@ export const LoginUser = async (req: Request, res: Response): Promise<any> => {
 
 export const UserUpdate = async (req: CustomRequest, res: Response): Promise<any> => {
     try {
-        const { name, contact, address, country } = req.body
-        const UserUpdate = { name, contact, address, country }
+        const { name, contact, address, country, profilePictuer } = req.body
+        const UserUpdate = { name, contact, address, country, profilePictuer }
         const UserId = req.params?.id
         const user = await UserModels.findById(UserId)
 
@@ -201,27 +201,16 @@ export const UserUpdate = async (req: CustomRequest, res: Response): Promise<any
             }
         }
 
-        // type Files = {
-        //     [fieldname: string]: MulterFile[];
-        // }
-
-        // if (req.files && (req.files as Files)) {
-        //     // const result2 = await cloudinary.uploader.upload((req.files as Files)?.ProfileImg[0].path);
-        //     // reqbody.ProfileImg = result2.secure_url
-        //     UserUpdate.profilePictuer = req.file?.originalname[0]
-
-        // } else {
-        //     UserUpdate.profilePictuer = user?.profilePictuer
-        // }
-
+        if (req.file) {
+            UserUpdate.profilePictuer = req.file?.originalname
+        } else {
+            UserUpdate.profilePictuer = user?.profilePictuer
+        }
         if (!name) UserUpdate.name = user.name
         if (!address) UserUpdate.address = user.address
         if (!country) UserUpdate.country = user.country
 
-        const User = await UserModels.findByIdAndUpdate(UserId, UserUpdate, { new: true });
-
-        console.log("Update User", User);
-
+        await UserModels.findByIdAndUpdate(UserId, UserUpdate, { new: true });
         return res.status(200).json({ message: "Profile Update Successfully..." });
 
     } catch (error) {
