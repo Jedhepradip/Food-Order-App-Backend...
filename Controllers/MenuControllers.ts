@@ -13,16 +13,20 @@ export const MenuCreated = async (req: CustomRequest, res: Response): Promise<an
     try {
         const { name, description, price } = req.body;
         const userId = req.user?.id
-        console.log(userId);
         const Restaurantdata = await Restaurant.findOne({ user: userId });
-        console.log(Restaurantdata);
 
         if (!Restaurantdata) {
             return res.status(400).json({
                 message: "Something went wrong, and we couldn’t create your any restaurant!"
             });
-
         }
+
+        console.log(req.file);
+
+        if (!req.file) {
+            return res.status(400).json({ message: "Menu Pictuer are missing.😊" })
+        }
+
         if (!name || !description || !price) {
             return res.status(400).json({
                 message: "Oops! It looks like some details are missing.😊"
@@ -33,7 +37,7 @@ export const MenuCreated = async (req: CustomRequest, res: Response): Promise<an
             name,
             description,
             price,
-            menuPictuer: "URL",
+            menuPictuer: req.file?.originalname,
             restaurantId: Restaurantdata?._id
         })
 
@@ -89,8 +93,8 @@ export const MenuUpdate = async (req: Request, res: Response): Promise<any> => {
         const { name, description, price } = req.body
         const menubody = { name, description, price }
         const menu = await MenusModels.findById(menuId)
-        console.log("menu :",menu);
-        
+        console.log("menu :", menu);
+
         if (!menu) {
             return res.status(400).json({ message: "Menu Is Not Found..." })
         }
@@ -104,8 +108,8 @@ export const MenuUpdate = async (req: Request, res: Response): Promise<any> => {
         if (!price) menubody.price = menu.price
 
         const MenuData = await MenusModels.findByIdAndUpdate(menuId, menubody, { new: true });
-        console.log("MenuData :",MenuData);
-        
+        console.log("MenuData :", MenuData);
+
         return res.status(200).json({ message: "Restaurant Updated Successfully...", MenuData })
 
     } catch (error) {
