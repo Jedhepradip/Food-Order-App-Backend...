@@ -4,8 +4,9 @@ import { GetLoginUser, GetMenuData, MenuCreated, MenuUpdate } from "../Controlle
 import { upload } from "../Middewares/Multer middleware"
 const router = express.Router()
 
-router.post("/Created/Meun", jwtMiddleware, upload.single("menuPictuer"), MenuCreated)
 router.get("/Get/Menu/Data/:id", jwtMiddleware, GetMenuData)
-router.get("/Get/Login/User/Data/:id", jwtMiddleware, GetLoginUser)
-router.put("/Menu/Update/:id", jwtMiddleware, MenuUpdate)
+router.get("/Get/Login/User/Data", jwtMiddleware, GetLoginUser)
+router.post("/Created/Meun", jwtMiddleware, upload.single("menuPictuer"), MenuCreated)
+router.put("/Menu/Update/:id", jwtMiddleware, upload.single("menuPictuer"), MenuUpdate)
+
 export default router;

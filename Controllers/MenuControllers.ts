@@ -90,25 +90,25 @@ export const GetLoginUser = async (req: CustomRequest, res: Response): Promise<a
 export const MenuUpdate = async (req: Request, res: Response): Promise<any> => {
     try {
         const menuId = req.params.id
-        const { name, description, price } = req.body
-        const menubody = { name, description, price }
+        const { name, description, price, menuPictuer } = req.body
+        const menubody = { name, description, price, menuPictuer }
         const menu = await MenusModels.findById(menuId)
-        console.log("menu :", menu);
 
         if (!menu) {
             return res.status(400).json({ message: "Menu Is Not Found..." })
         }
 
-        // if (!req.files) {
-        //     menu.menuPictuer = req.files
-        // }
+        if (!req.file) {
+            menuPictuer.menuPictuer = req.file?.originalname
+        }
+        else {
+            menuPictuer.menuPictuer = menu.menuPictuer
+        }
 
         if (!name) menubody.name = menu.name
         if (!description) menubody.description = menu.description
         if (!price) menubody.price = menu.price
-
         const MenuData = await MenusModels.findByIdAndUpdate(menuId, menubody, { new: true });
-        console.log("MenuData :", MenuData);
 
         return res.status(200).json({ message: "Restaurant Updated Successfully...", MenuData })
 

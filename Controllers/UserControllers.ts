@@ -206,6 +206,7 @@ export const UserUpdate = async (req: CustomRequest, res: Response): Promise<any
         } else {
             UserUpdate.profilePictuer = user?.profilePictuer
         }
+        
         if (!name) UserUpdate.name = user.name
         if (!address) UserUpdate.address = user.address
         if (!country) UserUpdate.country = user.country

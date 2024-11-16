@@ -5,11 +5,11 @@ import { SendOTPForRegistrationUser, RegistrationUser, LoginUser, UserUpdate, Fo
 import { jwtMiddleware } from "../Middewares/jwtAuthMiddleware";
 
 router.post("/Login/User", LoginUser);
-router.post("/Update/User/:id", UserUpdate);
 router.post("/ForgetPassword", ForgetPassword);
 router.post("/User/Password/Reset", PasswordReset)
 router.get("/Login/UserData", jwtMiddleware, GetLoginUserdata)
 router.post("/SendOTP/ForRegistration/User", SendOTPForRegistrationUser);
+router.post("/Update/User/:id", upload.single("profilePicture"), UserUpdate);
 router.post("/Registration/User", upload.single("profilePicture"), RegistrationUser);
 
 export default router;
