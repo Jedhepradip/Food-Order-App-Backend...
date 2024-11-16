@@ -14,8 +14,6 @@ export const RestaurantCreate = async (req: CustomRequest, res: Response): Promi
         const { restaurantName, city, country, deliveryTime, cuisines } = req.body;
         const userId = req.user?.id; // Assuming req.user is populated with user info after authentication
 
-        console.log(req.body);
-
         if (!restaurantName || !city || !country || !deliveryTime || !cuisines) {
             return res.status(400).json({
                 message: "Oops! It looks like some details are missing.😊"
@@ -96,12 +94,14 @@ export const RestaurantUpdate = async (req: Request, res: Response): Promise<any
         if (!RestaurantFind) {
             return res.status(400).json({ message: "Restaurant Not Found..." })
         }
-      
+
         if (req.file) {
             RestaurantReq.RestaurantBanner = req.file?.originalname;
         } else {
             RestaurantReq.RestaurantBanner = RestaurantFind?.RestaurantBanner;
         }
+
+        RestaurantReq.cuisines = RestaurantReq.cuisines.split(" ")
 
         if (!restaurantName) RestaurantReq.restaurantName = RestaurantFind.restaurantName
         if (!deliveryTime) RestaurantReq.deliveryTime = RestaurantFind.deliveryTime

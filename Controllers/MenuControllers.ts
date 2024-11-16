@@ -98,11 +98,13 @@ export const MenuUpdate = async (req: Request, res: Response): Promise<any> => {
             return res.status(400).json({ message: "Menu Is Not Found..." })
         }
 
-        if (!req.file) {
-            menuPictuer.menuPictuer = req.file?.originalname
+        console.log("req.file?.originalname :", req.file?.originalname);
+
+        if (req.file) {
+            menubody.menuPictuer = req.file?.originalname
         }
         else {
-            menuPictuer.menuPictuer = menu.menuPictuer
+            menubody.menuPictuer = menu.menuPictuer
         }
 
         if (!name) menubody.name = menu.name
@@ -110,7 +112,7 @@ export const MenuUpdate = async (req: Request, res: Response): Promise<any> => {
         if (!price) menubody.price = menu.price
         const MenuData = await MenusModels.findByIdAndUpdate(menuId, menubody, { new: true });
 
-        return res.status(200).json({ message: "Restaurant Updated Successfully...", MenuData })
+        return res.status(200).json({ message: "Menu Updated Successfully...", MenuData })
 
     } catch (error) {
         console.log(error);
