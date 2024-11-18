@@ -72,7 +72,10 @@ export const GetRestaurantData = async (req: CustomRequest, res: Response): Prom
 // Get All Restaurant Data
 export const GetAllRestaurantData = async (req: Request, res: Response): Promise<any> => {
     try {
-        const RestaurantData = await Restaurant.find()
+        const RestaurantData = await Restaurant.find().populate([
+            { path: 'menus' },
+        ]);
+
         if (!RestaurantData) {
             return res.status(400).json({ message: "Restaurant Not Fount...." })
         }
