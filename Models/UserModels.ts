@@ -1,6 +1,12 @@
 import mongoose from "mongoose";
 
+interface CartItem {
+    Menu: mongoose.Schema.Types.ObjectId[],
+    quantity: number
+}
+
 interface UserModelInterfase extends Document {
+    items: CartItem[],
     city: string,
     name: string,
     email: string,
@@ -49,6 +55,20 @@ const UserData: mongoose.Schema<UserModelInterfase> = new mongoose.Schema({
     resetTokenExpiration: {
         type: Number
     },
-},{timestamps:true})
+    items: [
+        {
+            Menu: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "meun",
+                required: true,
+            },
+            quantity: {
+                type: Number,
+                required: true,
+                min: 1,
+            },
+        },
+    ],
+}, { timestamps: true })
 
 export default mongoose.model("UserModel", UserData)

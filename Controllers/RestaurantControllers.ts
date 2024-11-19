@@ -1,6 +1,8 @@
 import express, { Request, Response } from "express"
 import Restaurant from "../Models/Restaurant";
 import Order from "../Models/Order";
+import UserModels from "../Models/UserModels";
+import Menus from "../Models/Menus";
 
 interface CustomRequest extends Request {
     user?: {
@@ -156,3 +158,76 @@ export const statusUpdate = async (req: Request, res: Response): Promise<any> =>
         return res.status(501).json({ message: "Internal Server Error..." })
     }
 }
+
+
+// Add to cart or increase quantity
+export const statusUpdate = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const { userId, productId } = req.body;
+
+        // Find user cart
+        let user = await UserModels.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const menuId = await Menus.findById(productId)
+        if (!menuId) {
+            return res.status(404).json({ error: "Menu not found" });
+        }
+
+        // Check if the product is already in the cart
+        const itemIndex = user.items.findIndex(
+            (item) => item.Menu.toString() === productId
+        );
+
+        if (itemIndex > -1) {
+            // Product exists, increase quantity
+            user.items[itemIndex].quantity += 1;
+        } else {
+            // Add new product to cart
+            user.items.push({ Menu: productId, quantity: 1 });
+        }
+
+        await user.save();
+        return res.status(200).json({ message: "Item added to cart", cart: user.items });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: "Server error" });
+    }
+};
+
+// Decrease quantity or remove item
+export const statusUpdate1 = async (req: Request, res: Response): Promise<Response> => {
+    try {
+        const { userId, productId } = req.body;
+        // Find user's cart
+        const user = await UserModels.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Find the item in the cart
+        const itemIndex = user.items.findIndex(
+            (item) => item.Menu.toString() === productId
+        );
+
+        if (itemIndex === -1) {
+            return res.status(404).json({ error: 'Item not found in cart' });
+        }
+
+        // Decrease quantity or remove the item
+        if (user.items[itemIndex].quantity > 1) {
+            user.items[itemIndex].quantity -= 1;
+        } else {
+            user.items.splice(itemIndex, 1); // Remove item if quantity is 1
+        }
+        // Save the updated cart
+        await user.save();
+
+        return res.status(200).json({ message: 'Item quantity updated', cart: user.items });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
