@@ -75,7 +75,14 @@ export const GetLoginUser = async (req: CustomRequest, res: Response): Promise<a
     try {
         const UserId = req.user?.id
         console.log(UserId);
-        const Restaurantdata = await Restaurant.findOne({ user: UserId }).populate({ path: "menus" });
+        const Restaurantdata = await Restaurant.findOne({ user: UserId })
+            .populate({
+                path: "menus", // Populate the `menus` field
+                populate: {
+                    path: "restaurantId", // Populate `restaurantId` within the populated `menus`
+                },
+            })
+
         if (!Restaurantdata) {
             return res.status(400).json({ message: "Not Created the Any Restaurant Menus..." })
         }
