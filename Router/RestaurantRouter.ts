@@ -1,14 +1,16 @@
 import express from "express"
 const router = express.Router()
-import { RestaurantCreate, GetRestaurantData, GetAllRestaurantData, RestaurantUpdate, GetRestaurantOrder, statusUpdate } from "../Controllers/RestaurantControllers"
+import { RestaurantCreate, GetRestaurantData, GetAllRestaurantData, RestaurantUpdate, GetRestaurantOrder, statusUpdate, AddToCartDecreaseQuantity, AddToCartIncreaseQuantity } from "../Controllers/RestaurantControllers"
 import { jwtMiddleware } from "../Middewares/jwtAuthMiddleware"
 import { upload } from "../Middewares/Multer middleware"
 
-router.post("/Create/Restaurant/User", jwtMiddleware, upload.single("RestaurantBanner"), RestaurantCreate)
+router.put("/Status/Update", jwtMiddleware, statusUpdate)
+router.get("/Restaurant/Order", jwtMiddleware, GetRestaurantOrder)
 router.get("/Get/Restaurant/Data", jwtMiddleware, GetRestaurantData)
 router.get("/Get/RestaurantData/AllUser", jwtMiddleware, GetAllRestaurantData)
-router.put("/Restaurant/Updated/:id", jwtMiddleware,upload.single("RestaurantBanner"), RestaurantUpdate)
-router.get("/Restaurant/Order", jwtMiddleware, GetRestaurantOrder)
-router.put("/Status/Update", jwtMiddleware, statusUpdate)
+router.post("/AddToCart/Increase/Quantity", jwtMiddleware, AddToCartIncreaseQuantity)
+router.post("/AddToCart/Decrease/Quantity", jwtMiddleware, AddToCartDecreaseQuantity)
+router.put("/Restaurant/Updated/:id", jwtMiddleware, upload.single("RestaurantBanner"), RestaurantUpdate)
+router.post("/Create/Restaurant/User", jwtMiddleware, upload.single("RestaurantBanner"), RestaurantCreate)
 
 export default router

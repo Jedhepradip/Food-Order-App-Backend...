@@ -159,12 +159,11 @@ export const statusUpdate = async (req: Request, res: Response): Promise<any> =>
     }
 }
 
-
 // Add to cart or increase quantity
-export const statusUpdate = async (req: Request, res: Response): Promise<Response> => {
+export const AddToCartIncreaseQuantity = async (req: CustomRequest, res: Response): Promise<any> => {
     try {
-        const { userId, productId } = req.body;
-
+        const { productId } = req.body;
+        const userId = req.user?.id
         // Find user cart
         let user = await UserModels.findById(userId);
         if (!user) {
@@ -198,7 +197,7 @@ export const statusUpdate = async (req: Request, res: Response): Promise<Respons
 };
 
 // Decrease quantity or remove item
-export const statusUpdate1 = async (req: Request, res: Response): Promise<Response> => {
+export const AddToCartDecreaseQuantity = async (req: Request, res: Response): Promise<any> => {
     try {
         const { userId, productId } = req.body;
         // Find user's cart
@@ -230,4 +229,4 @@ export const statusUpdate1 = async (req: Request, res: Response): Promise<Respon
         console.error(err);
         return res.status(500).json({ error: 'Server error' });
     }
-});
+};
