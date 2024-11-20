@@ -164,15 +164,19 @@ export const AddToCartIncreaseQuantity = async (req: CustomRequest, res: Respons
     try {
         const { productId } = req.body;
         const userId = req.user?.id
+        console.log(req.body);
+
+        console.log(productId);
+
         // Find user cart
         let user = await UserModels.findById(userId);
         if (!user) {
-            return res.status(404).json({ error: "User not found" });
+            return res.status(404).json({ message: "User not found" });
         }
 
         const menuId = await Menus.findById(productId)
         if (!menuId) {
-            return res.status(404).json({ error: "Menu not found" });
+            return res.status(404).json({ message: "Menu not found" });
         }
 
         // Check if the product is already in the cart
@@ -192,7 +196,7 @@ export const AddToCartIncreaseQuantity = async (req: CustomRequest, res: Respons
         return res.status(200).json({ message: "Item added to cart", cart: user.items });
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ error: "Server error" });
+        return res.status(500).json({ message: "Server error" });
     }
 };
 

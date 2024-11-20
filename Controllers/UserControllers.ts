@@ -206,7 +206,7 @@ export const UserUpdate = async (req: CustomRequest, res: Response): Promise<any
         } else {
             UserUpdate.profilePictuer = user?.profilePictuer
         }
-        
+
         if (!name) UserUpdate.name = user.name
         if (!address) UserUpdate.address = user.address
         if (!country) UserUpdate.country = user.country
@@ -223,7 +223,12 @@ export const UserUpdate = async (req: CustomRequest, res: Response): Promise<any
 
 export const GetLoginUserdata = async (req: CustomRequest, res: Response): Promise<any> => {
     try {
-        const Userdata = await UserModels.findById(req.user?.id)
+        const Userdata = await UserModels.findById(req.user?.id).populate({
+            path: "items",
+            populate: {
+                path: "Menu",
+            },
+        })
         if (!UserUpdate) {
             return res.status(401).json({ message: "User Not Found..." })
         }

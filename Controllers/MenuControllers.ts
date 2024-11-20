@@ -107,8 +107,6 @@ export const MenuUpdate = async (req: Request, res: Response): Promise<any> => {
             return res.status(400).json({ message: "Menu Is Not Found..." })
         }
 
-        console.log("req.file?.originalname :", req.file?.originalname);
-
         if (req.file) {
             menubody.menuPictuer = req.file?.originalname
         }
