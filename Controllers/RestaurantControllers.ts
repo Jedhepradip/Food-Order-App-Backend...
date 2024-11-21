@@ -164,9 +164,6 @@ export const AddToCartIncreaseQuantity = async (req: CustomRequest, res: Respons
     try {
         const { productId } = req.body;
         const userId = req.user?.id
-        console.log(req.body);
-
-        console.log(productId);
 
         // Find user cart
         let user = await UserModels.findById(userId);
@@ -201,13 +198,14 @@ export const AddToCartIncreaseQuantity = async (req: CustomRequest, res: Respons
 };
 
 // Decrease quantity or remove item
-export const AddToCartDecreaseQuantity = async (req: Request, res: Response): Promise<any> => {
+export const AddToCartDecreaseQuantity = async (req: CustomRequest, res: Response): Promise<any> => {
     try {
-        const { userId, productId } = req.body;
+        const { productId } = req.body;
+        const userId = req.user?.id
         // Find user's cart
         const user = await UserModels.findById(userId);
         if (!user) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ message: 'User not found' });
         }
 
         // Find the item in the cart
@@ -216,14 +214,13 @@ export const AddToCartDecreaseQuantity = async (req: Request, res: Response): Pr
         );
 
         if (itemIndex === -1) {
-            return res.status(404).json({ error: 'Item not found in cart' });
+            return res.status(404).json({ message: 'Item not found in cart' });
         }
 
-        // Decrease quantity or remove the item
         if (user.items[itemIndex].quantity > 1) {
             user.items[itemIndex].quantity -= 1;
         } else {
-            user.items.splice(itemIndex, 1); // Remove item if quantity is 1
+            user.items.splice(itemIndex, 1);
         }
         // Save the updated cart
         await user.save();
@@ -231,6 +228,24 @@ export const AddToCartDecreaseQuantity = async (req: Request, res: Response): Pr
         return res.status(200).json({ message: 'Item quantity updated', cart: user.items });
     } catch (err) {
         console.error(err);
-        return res.status(500).json({ error: 'Server error' });
+        return res.status(500).json({ message: 'Server error' });
     }
 };
+
+export const RemoveToaddToCart = async (req: CustomRequest, res: Response): Promise<any> => {
+    try {
+        const menuId = req.params.id
+        const userId = req.user?.id
+        const menu = await Menus.findById(menuId)
+        if (!menu) {
+            return res.status(400).json({ message: "Menu Is Not Found " })
+        }
+        const user = UserModels.findById(userId)
+        if(!user){
+            return res.status(400).json({message:"User Not Found"})
+        }
+        
+    } catch (error) {
+
+    }
+}

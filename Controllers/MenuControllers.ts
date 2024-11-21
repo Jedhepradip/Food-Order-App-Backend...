@@ -74,7 +74,6 @@ export const GetMenuData = async (req: Request, res: Response): Promise<any> => 
 export const GetLoginUser = async (req: CustomRequest, res: Response): Promise<any> => {
     try {
         const UserId = req.user?.id
-        console.log(UserId);
         const Restaurantdata = await Restaurant.findOne({ user: UserId })
             .populate({ path: "menus" })
 
