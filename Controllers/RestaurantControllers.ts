@@ -236,16 +236,20 @@ export const RemoveToaddToCart = async (req: CustomRequest, res: Response): Prom
     try {
         const menuId = req.params.id
         const userId = req.user?.id
+        console.log("menuId :", menuId);
         const menu = await Menus.findById(menuId)
         if (!menu) {
             return res.status(400).json({ message: "Menu Is Not Found " })
         }
         const user = UserModels.findById(userId)
-        if(!user){
-            return res.status(400).json({message:"User Not Found"})
+        if (!user) {
+            return res.status(400).json({ message: "User Not Found" })
         }
-        
-    } catch (error) {
 
+        return res.status(200).json({message:"Remove"})
+
+    } catch (error) {
+        console.log(error);
+        return res.status(501).json({ message: 'Internal Server Error..' })
     }
 }

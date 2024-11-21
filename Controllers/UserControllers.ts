@@ -84,7 +84,8 @@ export const SendOTPForRegistrationUser = async (req: Request, res: Response): P
                 </div>
             `,
         });
-        // Optionally, you can also store the OTP code in your database or log it for later verification.                
+        // Optionally, you can also store the OTP code in your database or log it for later verification. 
+        console.log(otpCode);                       
         return res.status(200).json({ message: "OTP sent successfully Check Your Email... ", otpCode });
 
     } catch (error) {
