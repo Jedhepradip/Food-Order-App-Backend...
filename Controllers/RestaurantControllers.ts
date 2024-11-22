@@ -236,17 +236,23 @@ export const RemoveToaddToCart = async (req: CustomRequest, res: Response): Prom
     try {
         const menuId = req.params.id
         const userId = req.user?.id
-        console.log("menuId :", menuId);
         const menu = await Menus.findById(menuId)
         if (!menu) {
             return res.status(400).json({ message: "Menu Is Not Found " })
         }
-        const user = UserModels.findById(userId)
-        if (!user) {
+        const userdata = await UserModels.findById(userId)
+
+        if (!userdata) {
             return res.status(400).json({ message: "User Not Found" })
         }
 
-        return res.status(200).json({message:"Remove"})
+        console.log(menu);
+
+        const itmeremove = userdata.items.includes(menuId)
+
+        console.log(itmeremove);
+
+        return res.status(200).json({ message: "Remove" })
 
     } catch (error) {
         console.log(error);
