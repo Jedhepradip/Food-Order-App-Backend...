@@ -234,28 +234,46 @@ export const AddToCartDecreaseQuantity = async (req: CustomRequest, res: Respons
 
 export const RemoveToaddToCart = async (req: CustomRequest, res: Response): Promise<any> => {
     try {
-        const menuId = req.params.id
-        const userId = req.user?.id
-        const menu = await Menus.findById(menuId)
+        const menuId = req.params.id;
+        const userId = req.user?.id;
+
+        const menu = await Menus.findById(menuId);
         if (!menu) {
-            return res.status(400).json({ message: "Menu Is Not Found " })
+            return res.status(400).json({ message: "Menu not found" });
         }
-        const userdata = await UserModels.findById(userId)
 
+        const userdata = await UserModels.findById(userId);
         if (!userdata) {
-            return res.status(400).json({ message: "User Not Found" })
+            return res.status(400).json({ message: "User not found" });
         }
 
-        console.log(menu);
-
-        const itmeremove = userdata.items.includes(menuId)
-
-        console.log(itmeremove);
-
-        return res.status(200).json({ message: "Remove" })
+        userdata.items = userdata.items.filter((val) => val.Menu.toString() !== menuId)
+        await userdata.save();
+        return res.status(200).json({ message: "Item removed from cart successfully" });
 
     } catch (error) {
-        console.log(error);
-        return res.status(501).json({ message: 'Internal Server Error..' })
+        console.error(error);
+        return res.status(500).json({ message: 'Internal server error' });
     }
-}
+};
+
+export const ClearAllAddToCart = async (req: CustomRequest, res: Response): Promise<any> => {
+    try {
+        const UserId = req.user?.id;
+
+        const user = await UserModels.findById(UserId);
+        if (!user) {
+            return res.status(400).json({ message: "User Not Found..." });
+        }
+
+        // Clear the user's items
+        user.items = [];
+
+        await user.save();
+
+        return res.status(200).json({ message: "All items cleared successfully." });
+    } catch (error) {
+        console.error(error);
+        return res.status(501).json({ message: "Internal Server Error." });
+    }
+};
