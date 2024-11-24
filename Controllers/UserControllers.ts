@@ -85,7 +85,7 @@ export const SendOTPForRegistrationUser = async (req: Request, res: Response): P
             `,
         });
         // Optionally, you can also store the OTP code in your database or log it for later verification. 
-        console.log(otpCode);                       
+        console.log(otpCode);
         return res.status(200).json({ message: "OTP sent successfully Check Your Email... ", otpCode });
 
     } catch (error) {
@@ -184,8 +184,8 @@ export const LoginUser = async (req: Request, res: Response): Promise<any> => {
 
 export const UserUpdate = async (req: CustomRequest, res: Response): Promise<any> => {
     try {
-        const { name, contact, address, country, profilePictuer } = req.body
-        const UserUpdate = { name, contact, address, country, profilePictuer }
+        const { name, contact, address, country, profilePictuer, city } = req.body
+        const UserUpdate = { name, contact, address, country, profilePictuer, city }
         const UserId = req.params?.id
         const user = await UserModels.findById(UserId)
 
@@ -211,6 +211,7 @@ export const UserUpdate = async (req: CustomRequest, res: Response): Promise<any
         if (!name) UserUpdate.name = user.name
         if (!address) UserUpdate.address = user.address
         if (!country) UserUpdate.country = user.country
+        if (!city) UserUpdate.city = user.city
 
         await UserModels.findByIdAndUpdate(UserId, UserUpdate, { new: true });
         return res.status(200).json({ message: "Profile Update Successfully..." });
@@ -278,7 +279,7 @@ export const ForgetPassword = async (req: Request, res: Response): Promise<any> 
             await user.save();
 
             // Step 3: Create the password reset link
-            const resetLink = `https://jobhunt0.netlify.app/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+            const resetLink = `http://localhost:5173/SetNewPassword?token=${token}&email=${encodeURIComponent(email)}`;
 
             // Step 4: Send the email
             const info = await transporter.sendMail({
@@ -327,7 +328,7 @@ export const ForgetPassword = async (req: Request, res: Response): Promise<any> 
 
 export const PasswordReset = async (req: Request, res: Response): Promise<any> => {
     try {
-        const { resetToken, password } = req.body;
+        const { resetToken,email, password,Cpassword } = req.body;
         if (!resetToken || !password) {
             return res.status(400).json({ message: "All fields are required" })
         }
