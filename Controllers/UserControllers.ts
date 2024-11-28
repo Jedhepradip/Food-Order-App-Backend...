@@ -4,6 +4,7 @@ import nodemailer from "nodemailer"
 import bcrypt from "bcrypt"
 import { generateToken } from "../Middewares/generateToken"
 import crypto from "crypto"
+import { unwatchFile } from "fs";
 
 interface CustomRequest extends Request {
     user?: {
@@ -328,14 +329,27 @@ export const ForgetPassword = async (req: Request, res: Response): Promise<any> 
 
 export const PasswordReset = async (req: Request, res: Response): Promise<any> => {
     try {
-        const { resetToken,email, password,Cpassword } = req.body;
-        if (!resetToken || !password) {
+        const { resetToken, email, password, Cpassword } = req.body;
+        if (!resetToken || !password || !email || !Cpassword) {
             return res.status(400).json({ message: "All fields are required" })
         }
+
         const user = await UserModels.findOne({ resetToken: resetToken })
         if (!user) {
             return res.status(400).json({ message: "Reset Token Is Not Mach..." })
         }
+        if (!(user.email == email)) {
+            return res.status(400).json({
+                message: "The email you entered does not match the one used to reset your password."
+            });
+        }
+
+        if (!(password == Cpassword)) {
+            return res.status(400).json({
+                message: "The confirm password does not match the entered password. Please try again."
+            });
+        }
+
         const Passwordhash = await bcrypt.hash(password, 11)
         user.password = Passwordhash
         user.resetToken = ""

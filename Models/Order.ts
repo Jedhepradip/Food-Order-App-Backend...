@@ -87,6 +87,6 @@ const OrderSchema: mongoose.Schema<Order> = new mongoose.Schema({
         enum: ["Pending", "Confirmed", "preparing", "outfordelivery", "delivered"],
         required: true,
     },
-},{timestamps:true});
+}, { timestamps: true });
 
 export default mongoose.model<Order>("Order", OrderSchema);
