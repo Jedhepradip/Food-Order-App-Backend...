@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
+dotenv.config();
 import cors from "cors";
 import Meun from "./Router/MenuRouter"
 import Order from "./Router/OrderRouter"
@@ -7,7 +8,6 @@ import UserRouter from "./Router/UserRouter";
 import Restaurant from "./Router/RestaurantRouter"
 import { connectDB } from "./Database/db";
 
-dotenv.config();
 const app = express();
 
 connectDB();

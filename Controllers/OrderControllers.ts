@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
-import stripe from "stripe";
+import Stripe from "stripe";
 import nodemailer from "nodemailer"
 import UserModels from "../Models/UserModels";
+import Menus from "../Models/Menus";
+import Order from "../Models/Order";
 
 interface CustomRequest extends Request {
     user?: {
@@ -10,64 +12,77 @@ interface CustomRequest extends Request {
     };
 }
 
-// router.post('/api/create-payment-intent', jwtAuthMiddleware, async (req, res) => {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
+    apiVersion: '2024-09-30.acacia',
+});
+
+
 export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Promise<any> => {
     try {
-
         console.log("Order Payments :", req.body);
+        const { email, name, country, address, expiry, cvc, MenuItem } = req.body
 
-        // Create payment intent using Stripe
-        // const paymentIntent = await stripe.paymentIntents.create({
-        //     amount: Math.round(amount), // Amount in smallest currency unit (e.g., paise)
-        //     currency: 'inr',
-        //     payment_method_types: ['card'],
-        //     metadata: { RoomsId }, // Attach metadata to track which course the payment is for
-        // });
+        const calculateItemTotal = (price: number, quantity: number) => price * quantity;
+        const calculateTotal = () => {
+            return MenuItem?.items?.reduce((total: number, item: { Menu: { price: number; }; quantity: number; }) =>
+                total + calculateItemTotal(item.Menu.price, item.quantity), 0);
+        };
 
-        // Find the user
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: Math.round(calculateTotal()), // Amount in smallest currency unit (e.g., paise)
+            currency: 'inr',
+            payment_method_types: ['card'],
+            metadata: MenuItem.items.map((val: any) => val.Menu._id), // Attach metadata to track which course the payment is for
+        });
+
         const user = await UserModels.findById(req.user?.id);
-
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        // Find the room/course by RoomsId
-        // const Rooms = await RoomsData.findById(RoomsId);
-        // console.log(Rooms);
-        // if (!Rooms) {
-        //     return res.status(404).json({ message: 'Room not found' });
-        // }
 
-        // const Payment = new Payments({
-        //     name: userName,
-        //     email: userEmail,
-        //     amount,
-        //     userId: req.user?.id,
-        //     RoomsId
-        // })
-        // await Payment.save()
-        // Check if user is already enrolled in the room
-        // const isAlreadyEnrolled = user?.PaymentRooms.includes(RoomsId);
-
-        // if (isAlreadyEnrolled) {
-        //     console.log("alredy have payment this rooms ");
-        //     return res.status(400).json({ message: 'User already Payment in this room' });
-        // }
-
-        // Enroll the user in the room
-        // user.PaymentRooms.push(RoomsId);
-        // await user.save();
-
-        // Add the user to room's payment list      
-
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            secure: true,
-            port: Number(process.env.NODEMAILER_PORT) || 465,
-            auth: {
-                user: process.env.USER,
-                pass: process.env.PASS,
-            },
+        const MenuItems = await Menus.find({
+            '_id': { $in: MenuItem.items.map((val: any) => val.Menu._id) }
         });
+
+        if (!MenuItems) {
+            return res.status(404).json({ message: 'MenuItmen not found' });
+        }
+console.log("MenuItems MenuItems",MenuItems);
+
+        const OrderPayment = new Order({          
+            status: "Pending",
+            userId: req.user?.id,
+            totalAmount: calculateTotal(),
+            restaurant: MenuItem.items.map((val: any) => val.Menu.restaurantId),
+            deliveryDetails: {
+                email,
+                name,
+                address,
+                country,
+                expiry,
+                cvc,
+            },
+            MenuItemsList: [
+                menuId,
+                name,
+                Image,
+                price,
+                Quantity,
+            ]
+
+        })
+
+        await OrderPayment.save()
+
+        // const transporter = nodemailer.createTransport({
+        //     host: 'smtp.gmail.com',
+        //     secure: true,
+        //     port: Number(process.env.NODEMAILER_PORT) || 465,
+        //     auth: {
+        //         user: process.env.USER,
+        //         pass: process.env.PASS,
+        //     },
+        // });
 
         // Send OTP email
         // const info = await transporter.sendMail({
@@ -101,7 +116,7 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
         //         </div>
         //     `,
         // });
-       return res.status(200).json("");
+        return res.status(200).json("");
         // res.status(200).json({ clientSecret: paymentIntent.client_secret });
 
     } catch (error) {

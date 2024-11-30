@@ -4,7 +4,6 @@ import nodemailer from "nodemailer"
 import bcrypt from "bcrypt"
 import { generateToken } from "../Middewares/generateToken"
 import crypto from "crypto"
-import { unwatchFile } from "fs";
 
 interface CustomRequest extends Request {
     user?: {

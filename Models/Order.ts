@@ -19,7 +19,7 @@ interface Order extends mongoose.Document {
     user: mongoose.Schema.Types.ObjectId;
     restaurant: mongoose.Schema.Types.ObjectId;
     deliveryDetails: DeliveryDetails;
-    cartItems: CartItems[];
+    MenuItemsList: CartItems[];
     totalAmount: number;
     status: "Pending" | "Confirmed" | "preparing" | "outfordelivery" | "delivered";
 }
@@ -30,7 +30,7 @@ const OrderSchema: mongoose.Schema<Order> = new mongoose.Schema({
         ref: "UserModel",
         required: true,
     },
-    restaurant: {   
+    restaurant: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Restaurant",
         required: true,
@@ -44,16 +44,24 @@ const OrderSchema: mongoose.Schema<Order> = new mongoose.Schema({
             type: String,
             required: true,
         },
-        UnitedKingdom: {
-            type: String,
-            required: true
-        },
         address: {
             type: String,
             required: true,
-        },      
+        },
+        country: {
+            type: String,
+            required: true,
+        },
+        expiry: {
+            type: String,
+            required: true,
+        },
+        cvc: {
+            type: String,
+            required: true,
+        }
     },
-    cartItems: [
+    MenuItemsList: [
         {
             menuId: {
                 type: mongoose.Schema.Types.ObjectId,
@@ -85,6 +93,7 @@ const OrderSchema: mongoose.Schema<Order> = new mongoose.Schema({
     status: {
         type: String,
         enum: ["Pending", "Confirmed", "preparing", "outfordelivery", "delivered"],
+        default: "Pending",
         required: true,
     },
 }, { timestamps: true });
