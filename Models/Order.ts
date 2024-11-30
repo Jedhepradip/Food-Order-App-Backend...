@@ -30,28 +30,28 @@ const OrderSchema: mongoose.Schema<Order> = new mongoose.Schema({
         ref: "UserModel",
         required: true,
     },
-    restaurant: {
+    restaurant: {   
         type: mongoose.Schema.Types.ObjectId,
         ref: "Restaurant",
         required: true,
     },
     deliveryDetails: {
-        name: {
-            type: String,
-            required: true,
-        },
         email: {
             type: String,
             required: true,
         },
+        name: {
+            type: String,
+            required: true,
+        },
+        UnitedKingdom: {
+            type: String,
+            required: true
+        },
         address: {
             type: String,
             required: true,
-        },
-        city: {
-            type: String,
-            required: true,
-        },
+        },      
     },
     cartItems: [
         {

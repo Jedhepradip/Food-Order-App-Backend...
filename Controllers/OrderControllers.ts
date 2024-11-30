@@ -12,11 +12,10 @@ interface CustomRequest extends Request {
 
 // router.post('/api/create-payment-intent', jwtAuthMiddleware, async (req, res) => {
 export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Promise<any> => {
-
-    const { amount, RoomsId, userName, userEmail } = req.body;
-    console.log(req.body);
-
     try {
+
+        console.log("Order Payments :", req.body);
+
         // Create payment intent using Stripe
         // const paymentIntent = await stripe.paymentIntents.create({
         //     amount: Math.round(amount), // Amount in smallest currency unit (e.g., paise)
@@ -31,7 +30,6 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        console.log(RoomsId);
         // Find the room/course by RoomsId
         // const Rooms = await RoomsData.findById(RoomsId);
         // console.log(Rooms);
@@ -103,6 +101,7 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
         //         </div>
         //     `,
         // });
+       return res.status(200).json("");
         // res.status(200).json({ clientSecret: paymentIntent.client_secret });
 
     } catch (error) {
