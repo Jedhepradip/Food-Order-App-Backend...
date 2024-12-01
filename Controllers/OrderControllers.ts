@@ -95,3 +95,19 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
         return res.status(500).json({ message: "Internal Server Error..." });
     }
 };
+
+export const UserOrderMenuItmesGetData = async (req: CustomRequest, res: Response): Promise<any> => {
+    try {
+        const UserID = req.user?.id
+        const user = await UserModels.findById(UserID)
+        if (!user) {
+            return res.status(400).json({ message: "User Not Found..." })
+        }
+        const OrderManuData = await Order.find().populate({ path: "user" })
+        console.log("OrderManuData :", OrderManuData);
+        return res.status(200).json(OrderManuData)
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Internal Server Error..." });
+    }
+}
