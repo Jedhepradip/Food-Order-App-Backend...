@@ -7,8 +7,7 @@ import Order from "../Models/Order";
 
 interface CustomRequest extends Request {
     user?: {
-        id: string;  // Define the specific type you expect for 'user.id'
-        // Add other properties if needed
+        id: string;
     };
 }
 
@@ -16,155 +15,38 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
     apiVersion: '2024-09-30.acacia',
 });
 
-
-// export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Promise<any> => {
-//     try {
-//         console.log("Order Payments :", req.body);
-//         const { email, name, country, address, expiry, cvc, MenuItem } = req.body
-
-//         const calculateItemTotal = (price: number, quantity: number) => price * quantity;
-//         const calculateTotal = () => {
-//             return MenuItem?.items?.reduce((total: number, item: { Menu: { price: number; }; quantity: number; }) =>
-//                 total + calculateItemTotal(item.Menu.price, item.quantity), 0);
-//         };
-
-//         console.log(MenuItem.items);
-
-
-//         const paymentIntent = await stripe.paymentIntents.create({
-//             amount: Math.round(11), // Amount in smallest currency unit (e.g., paise)
-//             currency: 'inr',
-//             payment_method_types: ['card'],
-//             metadata: MenuItem.items.map((val: any) => val.Menu._id), // Attach metadata to track which course the payment is for
-//         });
-
-//         const user = await UserModels.findById(req.user?.id);
-//         if (!user) {
-//             return res.status(404).json({ message: 'User not found' });
-//         }
-
-//         const MenuItems = await Menus.find({
-//             '_id': { $in: MenuItem.items.map((val: any) => val.Menu._id) }
-//         });
-
-//         if (!MenuItems) {
-//             return res.status(404).json({ message: 'MenuItmen not found' });
-//         }
-//         console.log("MenuItems MenuItems", MenuItems);
-
-//         const OrderPayment = new Order({
-//             status: "Pending",
-//             userId: req.user?.id,
-//             totalAmount: calculateTotal(),
-//             restaurant: MenuItem.items.map((val: any) => val.Menu.restaurantId),
-//             deliveryDetails: {
-//                 email,
-//                 name,
-//                 address,
-//                 country,
-//                 expiry,
-//                 cvc,
-//             },
-//             MenuItemsList: [
-//                 {
-//                     name: MenuItem.items.map((val: any) => val.Menu._id),
-//                     menuId: MenuItem.items.map((val: any) => val.Menu._id),
-//                     price: MenuItem.items.map((val: any) => val.Menu.price),
-//                     Quantity: MenuItem.items.map((val: any) => val.quantity),
-//                     Image: MenuItem.items.map((val: any) => val.Menu.menuPictuer),
-//                     description: MenuItem.items((val: any) => val.Menu.description),
-//                 }
-//             ]
-
-//         })
-
-//         await OrderPayment.save()
-
-//         console.log("OrderPayment :", OrderPayment);
-
-//         return res.status(200).json({ clientSecret: paymentIntent.client_secret });
-
-//         // const transporter = nodemailer.createTransport({
-//         //     host: 'smtp.gmail.com',
-//         //     secure: true,
-//         //     port: Number(process.env.NODEMAILER_PORT) || 465,
-//         //     auth: {
-//         //         user: process.env.USER,
-//         //         pass: process.env.PASS,
-//         //     },
-//         // });
-
-//         // Send OTP email
-//         // const info = await transporter.sendMail({
-//         //     from: process.env.FROM,
-//         //     to: "pradipjedhe69@gmail.com", // Send the email to the user
-//         //     subject: "Payment Confirmation", // Update the subject to reflect payment success
-//         //     text: `Your payment for ${Rooms.title} was successful. The total amount paid is $${Rooms.discountPrice}.`, // Fallback text
-//         //     html: `
-//         //        <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-//         //             <h2 style="color: black; text-align: center;">Payment Confirmation</h2>
-
-//         //             <p>We are happy to confirm that your payment for the product <strong>${Rooms.title}</strong> was successful!</p>
-
-//         //             <div style="background-color: #f4f4f4; padding: 10px 20px; border-radius: 8px; font-size: 18px; font-weight: bold; text-align: center; max-width: 300px; margin: auto;">
-//         //                 Total Paid: $${Rooms.discountPrice}
-//         //             </div>
-
-//         //             <h3 style="margin-top: 30px; color: #333;">Payment Details:</h3>
-//         //             <div style="background-color: #f9f9f9; padding: 10px; border-radius: 5px;">
-//         //                 <p><strong>Product Title:</strong> ${Rooms.title}</p>
-//         //                 <p><strong>Total Paid:</strong> $${Rooms.discountPrice}</p>
-//         //                 <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-//         //                 <p><strong>Time:</strong> ${new Date().toLocaleTimeString()}</p>
-//         //             </div>
-
-//         //             <p style="margin-top: 30px;">Thank you for your payment and for using our service. If you have any questions or concerns, feel free to contact our support team.</p>
-
-//         //             <p>Best regards, <br/> The Support Team</p>
-
-//         //             <p style="font-size: 12px; color: #888; margin-top: 20px;">If you did not make this payment, please contact us immediately at support@yourcompany.com.</p>
-//         //         </div>
-//         //     `,
-//         // });
-//         return res.status(200).json("");
-//         // res.status(200).json({ clientSecret: paymentIntent.client_secret });
-
-//     } catch (error) {
-//         console.error('Error creating payment intent:', error);
-//         res.status(500).json({ message: 'Unable to create payment intent' });
-//     }
-// }
-
 export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Promise<any> => {
     try {
         console.log("Order Payments :", req.body);
         const { email, name, country, address, expiry, cvc, MenuItem } = req.body;
 
-        const calculateItemTotal = (price: number, quantity: number) => price * quantity;
+        if (!email || !name || !country || !address || !expiry || !cvc || !MenuItem) {
+            return res.status(400).json({ message: "Invalid MenuItem data" });
+        }
 
-        const calculateTotal = () => {
-            return MenuItem?.items?.reduce(
-                (total: number, item: { Menu: { price: number }; quantity: number }) =>
-                    total + calculateItemTotal(item.Menu.price, item.quantity),
+        const calculateItemTotal = (price: number, quantity: number) => price * quantity;
+        const calculateTotal = (): number => {
+            const total = MenuItem?.items?.reduce(
+                (sum: number, item: { Menu: { price: number }; quantity: number }) =>
+                    sum + calculateItemTotal(item.Menu.price, item.quantity),
                 0
             );
+            return total;
         };
 
-        const totalAmount = calculateTotal() * 100; // Convert to smallest currency unit (paise for INR)
-
-        // Validate the total amount
-        if (totalAmount < 4200) {
+        const totalAmountInPaise = Math.round(calculateTotal() * 100);
+        if (totalAmountInPaise < 5000) {
             return res.status(400).json({
-                message: "Total amount must be at least ₹42.00",
+                message: "Order total is too low to process payment.",
             });
         }
 
         const paymentIntent = await stripe.paymentIntents.create({
-            amount: Math.round(totalAmount), // Ensure this is in paise
+            amount: totalAmountInPaise,
             currency: "inr",
             payment_method_types: ["card"],
             metadata: {
-                menuItems: MenuItem.items.map((val: any) => val.Menu._id)
+                menuItems: MenuItem.items[0].Menu._id
             },
         });
 
@@ -183,9 +65,10 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
 
         const OrderPayment = new Order({
             status: "Pending",
-            userId: req.user?.id,
-            totalAmount,
-            restaurant: MenuItem.items.map((val: any) => val.Menu.restaurantId),
+            user: req.user?.id,
+            totalAmount: totalAmountInPaise / 100, // Convert back to INR for storage
+            restaurant: MenuItem.items[0].Menu.restaurantId,
+            // restaurant: MenuItem.items.map((val: any) => val.Menu.restaurantId),
             deliveryDetails: {
                 email,
                 name,
@@ -198,7 +81,7 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
                 menuId: val.Menu._id,
                 name: val.Menu.name,
                 price: val.Menu.price,
-                quantity: val.quantity,
+                Quantity: val.quantity,
                 image: val.Menu.menuPicture,
                 description: val.Menu.description,
             })),
@@ -206,11 +89,9 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
 
         await OrderPayment.save();
 
-        console.log("OrderPayment :", OrderPayment);
-
         return res.status(200).json({ clientSecret: paymentIntent.client_secret });
     } catch (error) {
         console.error("Error creating payment intent:", error);
-        res.status(500).json({ message: "Unable to create payment intent" });
+        return res.status(500).json({ message: "Internal Server Error..." });
     }
 };

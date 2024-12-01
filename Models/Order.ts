@@ -5,6 +5,9 @@ interface DeliveryDetails {
     email: string;
     address: string;
     city: string;
+    country:string,
+    expiry:string,
+    cvc:string,
 }
 
 interface CartItems {
@@ -12,6 +15,7 @@ interface CartItems {
     name: string;
     image: string;
     price: number;
+    description:string;
     Quantity: number;
 }
 
@@ -74,7 +78,7 @@ const OrderSchema: mongoose.Schema<Order> = new mongoose.Schema({
             },
             image: {
                 type: String,
-                required: true,
+                // required: true,
             },
             price: {
                 type: Number,
@@ -84,6 +88,10 @@ const OrderSchema: mongoose.Schema<Order> = new mongoose.Schema({
                 type: Number,
                 required: true,
             },
+            description:{
+                type: String,
+                required: true,
+            }
         },
     ],
     totalAmount: {
