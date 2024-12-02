@@ -4,7 +4,7 @@ import { RestaurantCreate, GetRestaurantData, GetAllRestaurantData, RestaurantUp
 import { jwtMiddleware } from "../Middewares/jwtAuthMiddleware"
 import { upload } from "../Middewares/Multer middleware"
 
-router.put("/Status/Update", jwtMiddleware, statusUpdate)
+router.put("/Status/Update/:id", jwtMiddleware, statusUpdate)
 router.get("/Restaurant/Order", jwtMiddleware, GetRestaurantOrder)
 router.get("/Get/Restaurant/Data", jwtMiddleware, GetRestaurantData)
 router.delete("/ClearAll/AddToCart", jwtMiddleware, ClearAllAddToCart)

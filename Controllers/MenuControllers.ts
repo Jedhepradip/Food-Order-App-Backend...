@@ -21,8 +21,6 @@ export const MenuCreated = async (req: CustomRequest, res: Response): Promise<an
             });
         }
 
-        console.log(req.file);
-
         if (!req.file) {
             return res.status(400).json({ message: "Menu Pictuer are missing.😊" })
         }

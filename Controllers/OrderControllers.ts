@@ -18,17 +18,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
 
 export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Promise<any> => {
     try {
-        console.log("Order Payments :", req.body);
         const { email, name, country, address, expiry, cvc, MenuItem } = req.body;
 
         if (!email || !name || !country || !address || !expiry || !cvc || !MenuItem) {
             return res.status(400).json({ message: "Invalid MenuItem data" });
         }
-
-        MenuItem.items.map((val: any) => (
-            console.log("val :",val.Menu.menuPictuer)
-        ))
-        // return
 
         const calculateItemTotal = (price: number, quantity: number) => price * quantity;
         const calculateTotal = (): number => {
@@ -70,7 +64,6 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
         }
 
         const OrderPayment = new Order({
-            status: "Pending",
             user: req.user?.id,
             totalAmount: totalAmountInPaise / 100, // Convert back to INR for storage
             // restaurant: MenuItem.items[0].Menu.restaurantId,
@@ -90,11 +83,11 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
                 Quantity: val.quantity,
                 image: val.Menu.menuPictuer,
                 description: val.Menu.description,
+                status: "Pending",
             })),
         });
 
         await OrderPayment.save();
-
         return res.status(200).json({ clientSecret: paymentIntent.client_secret });
     } catch (error) {
         console.error("Error creating payment intent:", error);
@@ -110,7 +103,6 @@ export const UserOrderMenuItmesGetData = async (req: CustomRequest, res: Respons
             return res.status(400).json({ message: "User Not Found..." })
         }
         const OrderManuData = await Order.find().populate({ path: "user" })
-        console.log("OrderManuData :", OrderManuData);
         return res.status(200).json(OrderManuData)
     } catch (error) {
         console.log(error);

@@ -145,13 +145,22 @@ export const GetRestaurantOrder = async (req: CustomRequest, res: Response): Pro
 export const statusUpdate = async (req: Request, res: Response): Promise<any> => {
     try {
         const OrderId = req.params.id
-        const { status } = req.body
+        const { status, menuID } = req.body
+
+        console.log(req.body);
+
         const order = await Order.findById(OrderId)
         if (!order) {
             return res.status(400).json({ message: "Order Not Found..." })
         }
-        order.status = status
-        await order.save()
+        order.MenuItemsList.forEach((val) => {
+            if (val.menuId == menuID) {
+                val.status = status; 
+                console.log(val.status);                             
+            }
+        });
+
+        await order.save();
         return res.status(200).json({ message: "Order Status Update..." })
     } catch (error) {
         console.log(error);
