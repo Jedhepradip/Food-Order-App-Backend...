@@ -21,7 +21,7 @@ interface CartItems {
 
 interface Order extends mongoose.Document {
     user: mongoose.Schema.Types.ObjectId;
-    restaurant: mongoose.Schema.Types.ObjectId;
+    restaurant: mongoose.Schema.Types.ObjectId[];
     deliveryDetails: DeliveryDetails;
     MenuItemsList: CartItems[];
     totalAmount: number;
@@ -34,11 +34,11 @@ const OrderSchema: mongoose.Schema<Order> = new mongoose.Schema({
         ref: "UserModel",
         required: true,
     },
-    restaurant: {
+    restaurant: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Restaurant",
         required: true,
-    },
+    }],
     deliveryDetails: {
         email: {
             type: String,

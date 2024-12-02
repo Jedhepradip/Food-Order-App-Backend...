@@ -4,6 +4,7 @@ import nodemailer from "nodemailer"
 import UserModels from "../Models/UserModels";
 import Menus from "../Models/Menus";
 import Order from "../Models/Order";
+import { log } from "console";
 
 interface CustomRequest extends Request {
     user?: {
@@ -23,6 +24,11 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
         if (!email || !name || !country || !address || !expiry || !cvc || !MenuItem) {
             return res.status(400).json({ message: "Invalid MenuItem data" });
         }
+
+        MenuItem.items.map((val: any) => (
+            console.log("val :",val.Menu.menuPictuer)
+        ))
+        // return
 
         const calculateItemTotal = (price: number, quantity: number) => price * quantity;
         const calculateTotal = (): number => {
@@ -67,8 +73,8 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
             status: "Pending",
             user: req.user?.id,
             totalAmount: totalAmountInPaise / 100, // Convert back to INR for storage
-            restaurant: MenuItem.items[0].Menu.restaurantId,
-            // restaurant: MenuItem.items.map((val: any) => val.Menu.restaurantId),
+            // restaurant: MenuItem.items[0].Menu.restaurantId,
+            restaurant: MenuItem.items.map((val: any) => val.Menu.restaurantId),
             deliveryDetails: {
                 email,
                 name,
@@ -82,7 +88,7 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
                 name: val.Menu.name,
                 price: val.Menu.price,
                 Quantity: val.quantity,
-                image: val.Menu.menuPicture,
+                image: val.Menu.menuPictuer,
                 description: val.Menu.description,
             })),
         });
