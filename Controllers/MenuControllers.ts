@@ -123,3 +123,16 @@ export const MenuUpdate = async (req: Request, res: Response): Promise<any> => {
         return res.status(501).json({ message: "Internal Server Error..." })
     }
 }
+
+export const AllMenuDataGet = async (req: CustomRequest, res: Response): Promise<any> => {
+    try {
+        const menu = await MenusModels.find()
+        if (!menu) {
+            return res.status(400).json({ message: "Not Created the Any Menus..." })
+        }
+        return res.status(200).json(menu)
+    } catch (error) {
+        console.log(error);
+        return res.status(501).json({ message: "Internal Server Error..." })
+    }
+}

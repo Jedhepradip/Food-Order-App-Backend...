@@ -109,3 +109,19 @@ export const UserOrderMenuItmesGetData = async (req: CustomRequest, res: Respons
         return res.status(500).json({ message: "Internal Server Error..." });
     }
 }
+
+
+export const OrderMenuShowUser = async (req: CustomRequest, res: Response): Promise<any> => {
+    try {
+        const UserId = req.user?.id
+        const user = await UserModels.findById(UserId)
+        if (!user) {
+            return res.status(400).json({ message: "User Not Found" })
+        }
+        console.log(user);
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Internal Server Error..." });
+    }
+}
