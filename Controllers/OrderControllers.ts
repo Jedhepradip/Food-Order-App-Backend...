@@ -18,7 +18,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
 
 export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Promise<any> => {
     try {
-        const { email, name, country, address, expiry, cvc, MenuItem } = req.body;
+        const { email, name, country, address, expiry, cvc, MenuItem, restaurantId, MenuID } = req.body;
 
         if (!email || !name || !country || !address || !expiry || !cvc || !MenuItem) {
             return res.status(400).json({ message: "Invalid MenuItem data" });
@@ -26,7 +26,7 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
 
         const calculateItemTotal = (price: number, quantity: number) => price * quantity;
         const calculateTotal = (): number => {
-            const total = MenuItem?.items?.reduce(
+            const total = MenuItem?.reduce(
                 (sum: number, item: { Menu: { price: number }; quantity: number }) =>
                     sum + calculateItemTotal(item.Menu.price, item.quantity),
                 0
@@ -46,28 +46,22 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
             currency: "inr",
             payment_method_types: ["card"],
             metadata: {
-                menuItems: MenuItem.items[0].Menu._id
+                menuItems: MenuID,
             },
         });
-
         const user = await UserModels.findById(req.user?.id);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-
-        const MenuItems = await Menus.find({
-            _id: { $in: MenuItem.items.map((val: any) => val.Menu._id) },
-        });
-
-        if (!MenuItems) {
+        const MenuItemsdata = await Menus.findById(MenuID)
+        if (!MenuItemsdata) {
             return res.status(404).json({ message: "Menu items not found" });
         }
 
         const OrderPayment = new Order({
             user: req.user?.id,
-            totalAmount: totalAmountInPaise / 100, // Convert back to INR for storage
-            // restaurant: MenuItem.items[0].Menu.restaurantId,
-            restaurant: MenuItem.items.map((val: any) => val.Menu.restaurantId),
+            totalAmount: totalAmountInPaise / 100,
+            restaurant: restaurantId,
             deliveryDetails: {
                 email,
                 name,
@@ -76,13 +70,13 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
                 expiry,
                 cvc,
             },
-            MenuItemsList: MenuItem.items.map((val: any) => ({
-                menuId: val.Menu._id,
-                name: val.Menu.name,
-                price: val.Menu.price,
-                Quantity: val.quantity,
-                image: val.Menu.menuPictuer,
-                description: val.Menu.description,
+            MenuItemsList: MenuItem?.map((val: any) => ({
+                menuId: val?.Menu?._id,
+                name: val?.Menu?.name,
+                price: val?.Menu?.price,
+                Quantity: val?.quantity,
+                image: val?.Menu?.menuPictuer,
+                description: val?.Menu?.description,
                 status: "Pending",
             })),
         });

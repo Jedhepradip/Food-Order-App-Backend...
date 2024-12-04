@@ -22,7 +22,7 @@ interface CartItems {
 
 interface Order extends mongoose.Document {
     user: mongoose.Schema.Types.ObjectId;
-    restaurant: mongoose.Schema.Types.ObjectId[];
+    restaurant: mongoose.Schema.Types.ObjectId;
     deliveryDetails: DeliveryDetails;
     MenuItemsList: CartItems[];
     totalAmount: number;
