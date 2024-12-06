@@ -113,16 +113,15 @@ export const UserOrderMenuItmesGetData = async (req: CustomRequest, res: Respons
     }
 };
 
-export const OrderMenuShowUser = async (req: CustomRequest, res: Response): Promise<any> => {
+export const AllOrderDataShow = async (req: CustomRequest, res: Response): Promise<any> => {
     try {
-        const UserId = req.user?.id
-        const user = await UserModels.findById(UserId)
-        if (!user) {
-            return res.status(400).json({ message: "User Not Found" })
+        const OrderAll = await Order.find()
+        if(!OrderAll){
+            return res.status(400).json({message:"Order is Not Find..."})
         }
-
+        return res.status(200).json(OrderAll)
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Internal Server Error..." });
+        console.error("Error fetching user orders:", error);
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 }
