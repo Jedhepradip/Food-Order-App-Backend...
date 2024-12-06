@@ -91,19 +91,27 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
 
 export const UserOrderMenuItmesGetData = async (req: CustomRequest, res: Response): Promise<any> => {
     try {
-        const UserID = req.user?.id
-        const user = await UserModels.findById(UserID)
-        if (!user) {
-            return res.status(400).json({ message: "User Not Found..." })
+        const UserID = req.user?.id;
+        if (!UserID) {
+            return res.status(401).json({ message: "Unauthorized: User ID not found" });
         }
-        const OrderManuData = await Order.find().populate({ path: "user" })
-        return res.status(200).json(OrderManuData)
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Internal Server Error..." });
-    }
-}
 
+        const user = await UserModels.findById(UserID);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const OrderMenuData = await Order.find({ user: UserID })
+            .populate({ path: "user", model: "UserModel", select: "name email" })
+            .populate({ path: "restaurant", model: "Restaurant", select: "name address" });
+
+        console.log("Order Data for User:", OrderMenuData);
+        return res.status(200).json(OrderMenuData);
+    } catch (error) {
+        console.error("Error fetching user orders:", error);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+};
 
 export const OrderMenuShowUser = async (req: CustomRequest, res: Response): Promise<any> => {
     try {
@@ -112,7 +120,6 @@ export const OrderMenuShowUser = async (req: CustomRequest, res: Response): Prom
         if (!user) {
             return res.status(400).json({ message: "User Not Found" })
         }
-        console.log(user);
 
     } catch (error) {
         console.log(error);

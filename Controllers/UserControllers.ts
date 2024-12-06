@@ -49,6 +49,7 @@ export const SendOTPForRegistrationUser = async (req: Request, res: Response): P
 
         // Send OTP email
         const otpCode = Math.floor(100000 + Math.random() * 900000); // Generates a 6-digit OTP
+        console.log("OTP Code :", otpCode);
 
         const info = await transporter.sendMail({
             from: process.env.FROM,
