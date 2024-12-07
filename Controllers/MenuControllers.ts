@@ -126,7 +126,7 @@ export const MenuUpdate = async (req: Request, res: Response): Promise<any> => {
 
 export const AllMenuDataGet = async (req: CustomRequest, res: Response): Promise<any> => {
     try {
-        const menu = await MenusModels.find()
+        const menu = await MenusModels.find().populate({ path: "restaurantId" })
         if (!menu) {
             return res.status(400).json({ message: "Not Created the Any Menus..." })
         }
