@@ -242,6 +242,19 @@ export const GetLoginUserdata = async (req: CustomRequest, res: Response): Promi
     }
 }
 
+export const UserAllDataSend = async (req: CustomRequest, res: Response): Promise<any> => {
+    try {
+        const User = await UserModels.find()
+        if (!User) {
+            return res.status(400).json({ message: "Users Not Find..." })
+        }
+        return res.status(200).json(User)
+    } catch (error) {
+        console.log(error);
+        return res.status(501).json({ message: "Internal Server Error.." })
+    }
+}
+
 export const ForgetPassword = async (req: Request, res: Response): Promise<any> => {
     try {
         const { email } = req.body

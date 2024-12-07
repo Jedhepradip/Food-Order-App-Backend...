@@ -64,9 +64,9 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
             restaurant: restaurantId,
             deliveryDetails: {
                 email,
-                name,
+                name: user?.name,
                 address,
-                country,
+                country: user?.country,
                 expiry,
                 cvc,
             },
@@ -116,8 +116,8 @@ export const UserOrderMenuItmesGetData = async (req: CustomRequest, res: Respons
 export const AllOrderDataShow = async (req: CustomRequest, res: Response): Promise<any> => {
     try {
         const OrderAll = await Order.find()
-        if(!OrderAll){
-            return res.status(400).json({message:"Order is Not Find..."})
+        if (!OrderAll) {
+            return res.status(400).json({ message: "Order is Not Find..." })
         }
         return res.status(200).json(OrderAll)
     } catch (error) {
