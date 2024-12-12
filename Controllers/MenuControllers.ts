@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import MenusModels from "../Models/Menus";
 import Restaurant from "../Models/Restaurant";
+import { v2 as cloudinary } from 'cloudinary';
+
 
 interface CustomRequest extends Request {
     user?: {
@@ -9,11 +11,27 @@ interface CustomRequest extends Request {
     };
 }
 
+interface MulterFile {
+    originalname: string;
+    path: string;
+    filename: string;
+    mimetype: string;
+    size: number;
+    // Add other properties from Multer's File type if necessary
+}
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME || '',
+    api_key: process.env.CLOUDINARY_API_KEY || '',
+    api_secret: process.env.CLOUDINARY_API_SECRET || '',
+  });
+
 export const MenuCreated = async (req: CustomRequest, res: Response): Promise<any> => {
     try {
         const { name, description, price } = req.body;
         const userId = req.user?.id
         const Restaurantdata = await Restaurant.findOne({ user: userId });
+        console.log(req.body);
 
         if (!Restaurantdata) {
             return res.status(400).json({
@@ -25,6 +43,10 @@ export const MenuCreated = async (req: CustomRequest, res: Response): Promise<an
             return res.status(400).json({ message: "Menu Pictuer are missing.😊" })
         }
 
+        const result = await cloudinary.uploader.upload(req.file!.path);
+        console.log("result :", result);
+
+
         if (!name || !description || !price) {
             return res.status(400).json({
                 message: "Oops! It looks like some details are missing.😊"
@@ -35,7 +57,7 @@ export const MenuCreated = async (req: CustomRequest, res: Response): Promise<an
             name,
             description,
             price,
-            menuPictuer: req.file?.originalname,
+            menuPictuer: result,
             restaurantId: Restaurantdata?._id
         })
 
@@ -104,10 +126,14 @@ export const MenuUpdate = async (req: Request, res: Response): Promise<any> => {
             return res.status(400).json({ message: "Menu Is Not Found..." })
         }
 
-        if (req.file) {
-            menubody.menuPictuer = req.file?.originalname
+        type Files = {
+            [fieldname: string]: MulterFile[];
         }
-        else {
+
+        if (req.files && (req.files as Files).RestaurantBanner) {
+            const result = await cloudinary.uploader.upload(req.file!.path);
+            menubody.menuPictuer = result
+        } else {
             menubody.menuPictuer = menu.menuPictuer
         }
 

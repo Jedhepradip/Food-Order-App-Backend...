@@ -1,9 +1,10 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import UserModels from "../Models/UserModels";
 import nodemailer from "nodemailer"
 import bcrypt from "bcrypt"
 import { generateToken } from "../Middewares/generateToken"
 import crypto from "crypto"
+import { v2 as cloudinary } from 'cloudinary';
 
 interface CustomRequest extends Request {
     user?: {
@@ -17,6 +18,22 @@ interface UserPayload {
     email: string,
     name: string,
 }
+
+
+interface MulterFile {
+    originalname: string;
+    path: string;
+    filename: string;
+    mimetype: string;
+    size: number;
+    // Add other properties from Multer's File type if necessary
+}
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
+    api_key: process.env.CLOUDINARY_API_KEY!,
+    api_secret: process.env.CLOUDINARY_API_SECRET!,
+});
 
 export const SendOTPForRegistrationUser = async (req: Request, res: Response): Promise<any> => {
     try {
@@ -104,6 +121,8 @@ export const RegistrationUser = async (req: Request, res: Response): Promise<any
             return res.status(400).json({ message: "Profile Pictuer are missing.😊" })
         }
 
+        const result = await cloudinary.uploader.upload(req.file!.path);
+
         if (!name || !email || !contact || !password || !contact || !address || !country || !city) {
             return res.status(400).json({
                 message: "Oops! It looks like some details are missing.😊"
@@ -130,7 +149,7 @@ export const RegistrationUser = async (req: Request, res: Response): Promise<any
             country,
             city,
             password: passwordhash,
-            profilePictuer: req.file.originalname,
+            profilePictuer: result,
         })
         await UserData.save()
 
@@ -203,8 +222,13 @@ export const UserUpdate = async (req: CustomRequest, res: Response): Promise<any
             }
         }
 
-        if (req.file) {
-            UserUpdate.profilePictuer = req.file?.originalname
+        type Files = {
+            [fieldname: string]: MulterFile[];
+        }
+
+        if (req.files && (req.files as Files).profilePictuer) {
+            const result = await cloudinary.uploader.upload(req.file!.path);
+            UserUpdate.profilePictuer = result
         } else {
             UserUpdate.profilePictuer = user?.profilePictuer
         }
@@ -255,18 +279,21 @@ export const UserAllDataSend = async (req: CustomRequest, res: Response): Promis
     }
 }
 
-export const ForgetPassword = async (req: Request, res: Response): Promise<any> => {
+export const ForgetPassword = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
         const { email } = req.body
         if (!email) {
             return res.status(400).json({ message: "All fields are required" })
         }
+
+        console.log(email);
+
         const EmailCheck = await UserModels.findOne({ email: email })
         if (!EmailCheck) {
             return res.status(400).json({ message: "user not Found..." })
         }
         sendPasswordResetEmail(email)
-        const otp = Math.floor(1000 + Math.random() * 9000);
+        // const otp = Math.floor(1000 + Math.random() * 9000);
         // Set up the email transporter
         const transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
@@ -281,11 +308,10 @@ export const ForgetPassword = async (req: Request, res: Response): Promise<any> 
         async function sendPasswordResetEmail(email: string) {
             // Step 1: Generate a unique token
             const token = crypto.randomBytes(32).toString('hex');
-
             // Step 2: Store the token with the user's email (example using MongoDB)
             const user = await UserModels.findOne({ email });
             if (!user) {
-                throw new Error('User not found');
+                return res.status(400).json({ message: "User Not Found..." })
             }
 
             user.resetToken = token; // Create a field for reset token
@@ -328,7 +354,6 @@ export const ForgetPassword = async (req: Request, res: Response): Promise<any> 
                     </div>
                 `,
             });
-
             return res.status(200).json({
                 message: 'Password reset link has been sent to your email. Please check your inbox to reset your password.', resetLink
             });
@@ -337,6 +362,7 @@ export const ForgetPassword = async (req: Request, res: Response): Promise<any> 
     } catch (error) {
         console.log(error);
         return res.status(501).json({ message: "Internal Server Error.." })
+        return
     }
 }
 

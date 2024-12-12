@@ -3,6 +3,7 @@ import Restaurant from "../Models/Restaurant";
 import Order from "../Models/Order";
 import UserModels from "../Models/UserModels";
 import Menus from "../Models/Menus";
+import { v2 as cloudinary } from 'cloudinary';
 
 interface CustomRequest extends Request {
     user?: {
@@ -10,6 +11,21 @@ interface CustomRequest extends Request {
         // Add other properties if needed
     };
 }
+
+interface MulterFile {
+    originalname: string;
+    path: string;
+    filename: string;
+    mimetype: string;
+    size: number;
+    // Add other properties from Multer's File type if necessary
+}
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
+    api_key: process.env.CLOUDINARY_API_KEY!,
+    api_secret: process.env.CLOUDINARY_API_SECRET!,
+});
 
 export const RestaurantCreate = async (req: CustomRequest, res: Response): Promise<any> => {
     try {
@@ -26,6 +42,8 @@ export const RestaurantCreate = async (req: CustomRequest, res: Response): Promi
             return res.status(400).json({ message: "Restaurant Banner are missing.😊" })
         }
 
+        const result = await cloudinary.uploader.upload(req.file!.path);
+
         // Check if the user has already created a restaurant
         const existingRestaurant = await Restaurant.findOne({ user: userId });
         if (existingRestaurant) {
@@ -40,7 +58,7 @@ export const RestaurantCreate = async (req: CustomRequest, res: Response): Promi
             deliveryTime,
             cuisines: cuisines.split(" "),
             user: userId, // user is now set as a single ObjectId
-            RestaurantBanner: req.file?.originalname
+            RestaurantBanner: result,
         });
 
         await newRestaurant.save();
@@ -75,7 +93,7 @@ export const GetRestaurantData = async (req: CustomRequest, res: Response): Prom
 export const GetAllRestaurantData = async (req: Request, res: Response): Promise<any> => {
     try {
         const RestaurantData = await Restaurant.find().populate([
-            { path: 'menus' },{path:'user'}
+            { path: 'menus' }, { path: 'user' }
         ]);
 
         if (!RestaurantData) {
@@ -100,12 +118,17 @@ export const RestaurantUpdate = async (req: Request, res: Response): Promise<any
             return res.status(400).json({ message: "Restaurant Not Found..." })
         }
 
-        if (req.file) {
-            RestaurantReq.RestaurantBanner = req.file?.originalname;
+        type Files = {
+            [fieldname: string]: MulterFile[];
+        }
+
+        if (req.files && (req.files as Files).RestaurantBanner) {
+            const result = await cloudinary.uploader.upload(req.file!.path);
+            RestaurantReq.RestaurantBanner = result
         } else {
             RestaurantReq.RestaurantBanner = RestaurantFind?.RestaurantBanner;
         }
-
+        
         RestaurantReq.cuisines = RestaurantReq.cuisines.split(" ")
 
         if (!restaurantName) RestaurantReq.restaurantName = RestaurantFind.restaurantName
@@ -155,8 +178,8 @@ export const statusUpdate = async (req: Request, res: Response): Promise<any> =>
         }
         order.MenuItemsList.forEach((val) => {
             if (val.menuId == menuID) {
-                val.status = status; 
-                console.log(val.status);                             
+                val.status = status;
+                console.log(val.status);
             }
         });
 
