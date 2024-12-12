@@ -58,7 +58,7 @@ export const RestaurantCreate = async (req: CustomRequest, res: Response): Promi
             deliveryTime,
             cuisines: cuisines.split(" "),
             user: userId, // user is now set as a single ObjectId
-            RestaurantBanner: result,
+            RestaurantBanner: result.secure_url,
         });
 
         await newRestaurant.save();
@@ -124,7 +124,7 @@ export const RestaurantUpdate = async (req: Request, res: Response): Promise<any
 
         if (req.files && (req.files as Files).RestaurantBanner) {
             const result = await cloudinary.uploader.upload(req.file!.path);
-            RestaurantReq.RestaurantBanner = result
+            RestaurantReq.RestaurantBanner = result.secure_url
         } else {
             RestaurantReq.RestaurantBanner = RestaurantFind?.RestaurantBanner;
         }

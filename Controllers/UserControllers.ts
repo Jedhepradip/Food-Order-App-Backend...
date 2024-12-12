@@ -121,7 +121,11 @@ export const RegistrationUser = async (req: Request, res: Response): Promise<any
             return res.status(400).json({ message: "Profile Pictuer are missing.😊" })
         }
 
+        console.log("Req File", req.file);
+
         const result = await cloudinary.uploader.upload(req.file!.path);
+
+        console.log("result", result);
 
         if (!name || !email || !contact || !password || !contact || !address || !country || !city) {
             return res.status(400).json({
@@ -149,7 +153,7 @@ export const RegistrationUser = async (req: Request, res: Response): Promise<any
             country,
             city,
             password: passwordhash,
-            profilePictuer: result,
+            profilePictuer: result.secure_url,
         })
         await UserData.save()
 
@@ -228,7 +232,7 @@ export const UserUpdate = async (req: CustomRequest, res: Response): Promise<any
 
         if (req.files && (req.files as Files).profilePictuer) {
             const result = await cloudinary.uploader.upload(req.file!.path);
-            UserUpdate.profilePictuer = result
+            UserUpdate.profilePictuer = result.secure_url
         } else {
             UserUpdate.profilePictuer = user?.profilePictuer
         }

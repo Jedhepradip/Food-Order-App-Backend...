@@ -57,7 +57,7 @@ export const MenuCreated = async (req: CustomRequest, res: Response): Promise<an
             name,
             description,
             price,
-            menuPictuer: result,
+            menuPictuer: result.secure_url,
             restaurantId: Restaurantdata?._id
         })
 
@@ -130,9 +130,10 @@ export const MenuUpdate = async (req: Request, res: Response): Promise<any> => {
             [fieldname: string]: MulterFile[];
         }
 
-        if (req.files && (req.files as Files).RestaurantBanner) {
+        if (req.file) {
             const result = await cloudinary.uploader.upload(req.file!.path);
-            menubody.menuPictuer = result
+            menubody.menuPictuer = result.secure_url
+            
         } else {
             menubody.menuPictuer = menu.menuPictuer
         }
@@ -172,7 +173,7 @@ export const AdminDeleteTheMenu = async (req: CustomRequest, res: Response): Pro
             return res.status(400).json({ message: "Menu not found." });
         }
         console.log(menu);
-        
+
         // Delete the menu
         await MenusModels.findByIdAndDelete(MenuID);
         return res.status(200).json({ message: "Menu deleted successfully." });
