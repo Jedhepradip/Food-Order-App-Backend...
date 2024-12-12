@@ -399,3 +399,21 @@ export const PasswordReset = async (req: Request, res: Response): Promise<any> =
         return res.status(501).json({ message: "Internal Server Error.." })
     }
 }
+
+export const AdminDeleteTheUSER = async (req: CustomRequest, res: Response): Promise<any> => {
+    try {
+        const UserID = req.params.ID;
+        // Find the Restaurant by ID
+        const user = await UserModels.findById(UserID);
+        if (!user) {
+            return res.status(400).json({ message: "User not found." });
+        }
+
+        // Delete the Restaurant
+        await UserModels.findByIdAndDelete(UserID);
+        return res.status(200).json({ message: "User deleted successfully." });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal Server Error." });
+    }
+};

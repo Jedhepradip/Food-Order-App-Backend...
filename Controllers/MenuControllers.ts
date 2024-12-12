@@ -24,7 +24,7 @@ cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME || '',
     api_key: process.env.CLOUDINARY_API_KEY || '',
     api_secret: process.env.CLOUDINARY_API_SECRET || '',
-  });
+});
 
 export const MenuCreated = async (req: CustomRequest, res: Response): Promise<any> => {
     try {
@@ -162,3 +162,22 @@ export const AllMenuDataGet = async (req: CustomRequest, res: Response): Promise
         return res.status(501).json({ message: "Internal Server Error..." })
     }
 }
+
+export const AdminDeleteTheMenu = async (req: CustomRequest, res: Response): Promise<any> => {
+    try {
+        const MenuID = req.params.ID;
+        // Find the menu by ID
+        const menu = await MenusModels.findById(MenuID);
+        if (!menu) {
+            return res.status(400).json({ message: "Menu not found." });
+        }
+        console.log(menu);
+        
+        // Delete the menu
+        await MenusModels.findByIdAndDelete(MenuID);
+        return res.status(200).json({ message: "Menu deleted successfully." });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal Server Error." });
+    }
+};

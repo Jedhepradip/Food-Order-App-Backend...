@@ -128,7 +128,7 @@ export const RestaurantUpdate = async (req: Request, res: Response): Promise<any
         } else {
             RestaurantReq.RestaurantBanner = RestaurantFind?.RestaurantBanner;
         }
-        
+
         RestaurantReq.cuisines = RestaurantReq.cuisines.split(" ")
 
         if (!restaurantName) RestaurantReq.restaurantName = RestaurantFind.restaurantName
@@ -307,5 +307,24 @@ export const ClearAllAddToCart = async (req: CustomRequest, res: Response): Prom
     } catch (error) {
         console.error(error);
         return res.status(501).json({ message: "Internal Server Error." });
+    }
+};
+
+
+export const AdminDeleteTheRestaurant = async (req: CustomRequest, res: Response): Promise<any> => {
+    try {
+        const RestaurantID = req.params.ID;
+        // Find the Restaurant by ID
+        const RestaurantFind = await Restaurant.findById(RestaurantID);
+        if (!RestaurantFind) {
+            return res.status(400).json({ message: "Restaurant not found." });
+        }
+        
+        // Delete the Restaurant
+        await Restaurant.findByIdAndDelete(RestaurantID);
+        return res.status(200).json({ message: "Restaurant deleted successfully." });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Internal Server Error." });
     }
 };
