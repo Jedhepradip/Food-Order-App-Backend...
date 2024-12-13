@@ -81,6 +81,65 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
             })),
         });
 
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            secure: true,
+            port: Number(process.env.NODEMAILER_PORT) || 465,
+            auth: {
+                user: process.env.USER,
+                pass: process.env.PASS,
+            },
+        });
+
+        // Prepare order details
+        const orderId = "ORD12345"; // Example order ID
+        const orderDate = new Date(); // Example order date
+        const menuName = "Pizza Margherita"; // Example menu name
+        const menuPrice = 12.99; // Example menu price
+        const restaurantName = "JedheEats Delight"; // Example restaurant name
+        const totalPrice = 15.49; // Example total price (including taxes)
+        const companyName = "JedheEats"; // Example company name
+        const orderStatus = "Preparing"; // Example order status (e.g., Preparing, Out for Delivery, Delivered)
+
+        const info = await transporter.sendMail({
+            from: process.env.FROM,
+            to: "pradipjedhe69@gmail.com", // Send the email to the user
+            subject: `Order Confirmation - ${companyName}`, // Subject line
+            text: `Thank you for your order at ${companyName}!\n\n
+                   Order ID: ${orderId}\n
+                   Menu: ${menuName}\n
+                   Price: $${menuPrice.toFixed(2)}\n
+                   Restaurant: ${restaurantName}\n
+                   Total: $${totalPrice.toFixed(2)}\n
+                   Order Date: ${orderDate.toLocaleDateString()} ${orderDate.toLocaleTimeString()}\n
+                   Order Status: ${orderStatus}\n\n
+                   We're excited to prepare your meal!`,
+            html: `
+                <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                    <h2 style="color: black; text-align:center;">Thank you for your order at ${companyName}!</h2>
+                    <p>Hi ${name},</p>
+                    <p>Your order has been successfully placed. Below are the details of your order:</p>
+                    
+                    <h3 style="margin-top: 20px; color: #333;">Order Summary:</h3>
+                    <div style="background-color: #f9f9f9; padding: 10px; border-radius: 5px;">
+                        <p><strong>Order ID:</strong> ${orderId}</p>
+                        <p><strong>Menu:</strong> ${menuName}</p>
+                        <p><strong>Price:</strong> $${menuPrice.toFixed(2)}</p>
+                        <p><strong>Restaurant:</strong> ${restaurantName}</p>
+                        <p><strong>Total:</strong> $${totalPrice.toFixed(2)}</p>
+                        <p><strong>Order Date:</strong> ${orderDate.toLocaleDateString()} ${orderDate.toLocaleTimeString()}</p>
+                        <p><strong>Order Status:</strong> <span style="color: #007BFF;">${orderStatus}</span></p>
+                    </div>
+        
+                    <p style="margin-top: 30px;">We’re excited to prepare your meal and deliver it to you soon. If you have any questions or special requests, feel free to contact us!</p>
+                    
+                    <p>Best regards,<br/> The ${companyName} Team</p>
+                    
+                    <p style="font-size: 12px; color: #888; margin-top: 20px;">If you have any questions, please contact us at support@yourcompany.com.</p>
+                </div>
+            `,
+        });
+
         await OrderPayment.save();
         return res.status(200).json({ clientSecret: paymentIntent.client_secret });
     } catch (error) {
