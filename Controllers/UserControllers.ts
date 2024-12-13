@@ -30,9 +30,9 @@ interface MulterFile {
 }
 
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
-    api_key: process.env.CLOUDINARY_API_KEY!,
-    api_secret: process.env.CLOUDINARY_API_SECRET!,
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME || '',
+    api_key: process.env.CLOUDINARY_API_KEY || '',
+    api_secret: process.env.CLOUDINARY_API_SECRET || '',
 });
 
 export const SendOTPForRegistrationUser = async (req: Request, res: Response): Promise<any> => {
@@ -230,10 +230,12 @@ export const UserUpdate = async (req: CustomRequest, res: Response): Promise<any
             [fieldname: string]: MulterFile[];
         }
 
-        if (req.files && (req.files as Files).profilePictuer) {
+        if (req.file) {
             const result = await cloudinary.uploader.upload(req.file!.path);
+            console.log("Update");
             UserUpdate.profilePictuer = result.secure_url
         } else {
+            console.log("Update Not");
             UserUpdate.profilePictuer = user?.profilePictuer
         }
 

@@ -319,7 +319,7 @@ export const AdminDeleteTheRestaurant = async (req: CustomRequest, res: Response
         if (!RestaurantFind) {
             return res.status(400).json({ message: "Restaurant not found." });
         }
-        
+
         // Delete the Restaurant
         await Restaurant.findByIdAndDelete(RestaurantID);
         return res.status(200).json({ message: "Restaurant deleted successfully." });
