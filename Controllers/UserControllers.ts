@@ -232,10 +232,8 @@ export const UserUpdate = async (req: CustomRequest, res: Response): Promise<any
 
         if (req.file) {
             const result = await cloudinary.uploader.upload(req.file!.path);
-            console.log("Update");
             UserUpdate.profilePictuer = result.secure_url
         } else {
-            console.log("Update Not");
             UserUpdate.profilePictuer = user?.profilePictuer
         }
 

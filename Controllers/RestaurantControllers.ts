@@ -22,9 +22,9 @@ interface MulterFile {
 }
 
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
-    api_key: process.env.CLOUDINARY_API_KEY!,
-    api_secret: process.env.CLOUDINARY_API_SECRET!,
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME || '',
+    api_key: process.env.CLOUDINARY_API_KEY || '',
+    api_secret: process.env.CLOUDINARY_API_SECRET || '',
 });
 
 export const RestaurantCreate = async (req: CustomRequest, res: Response): Promise<any> => {
@@ -41,9 +41,7 @@ export const RestaurantCreate = async (req: CustomRequest, res: Response): Promi
         if (!req.file) {
             return res.status(400).json({ message: "Restaurant Banner are missing.😊" })
         }
-
         const result = await cloudinary.uploader.upload(req.file!.path);
-
         // Check if the user has already created a restaurant
         const existingRestaurant = await Restaurant.findOne({ user: userId });
         if (existingRestaurant) {
@@ -122,7 +120,7 @@ export const RestaurantUpdate = async (req: Request, res: Response): Promise<any
             [fieldname: string]: MulterFile[];
         }
 
-        if (req.files && (req.files as Files).RestaurantBanner) {
+        if (req.file) {
             const result = await cloudinary.uploader.upload(req.file!.path);
             RestaurantReq.RestaurantBanner = result.secure_url
         } else {
