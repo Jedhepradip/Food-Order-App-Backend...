@@ -31,7 +31,6 @@ export const MenuCreated = async (req: CustomRequest, res: Response): Promise<an
         const { name, description, price } = req.body;
         const userId = req.user?.id
         const Restaurantdata = await Restaurant.findOne({ user: userId });
-        console.log(req.body);
 
         if (!Restaurantdata) {
             return res.status(400).json({
@@ -44,8 +43,6 @@ export const MenuCreated = async (req: CustomRequest, res: Response): Promise<an
         }
 
         const result = await cloudinary.uploader.upload(req.file!.path);
-        console.log("result :", result);
-
 
         if (!name || !description || !price) {
             return res.status(400).json({
@@ -133,7 +130,7 @@ export const MenuUpdate = async (req: Request, res: Response): Promise<any> => {
         if (req.file) {
             const result = await cloudinary.uploader.upload(req.file!.path);
             menubody.menuPictuer = result.secure_url
-            
+
         } else {
             menubody.menuPictuer = menu.menuPictuer
         }
@@ -172,7 +169,6 @@ export const AdminDeleteTheMenu = async (req: CustomRequest, res: Response): Pro
         if (!menu) {
             return res.status(400).json({ message: "Menu not found." });
         }
-        console.log(menu);
 
         // Delete the menu
         await MenusModels.findByIdAndDelete(MenuID);

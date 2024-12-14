@@ -5,7 +5,6 @@ import UserModels from "../Models/UserModels";
 import Menus from "../Models/Menus";
 import Order from "../Models/Order";
 import Restaurant from "../Models/Restaurant";
-import { log } from "console";
 
 interface CustomRequest extends Request {
     user?: {
@@ -155,7 +154,6 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
             `,
         });
 
-
         await OrderPayment.save();
         return res.status(200).json({ clientSecret: paymentIntent.client_secret });
     } catch (error) {
@@ -180,7 +178,6 @@ export const UserOrderMenuItmesGetData = async (req: CustomRequest, res: Respons
             .populate({ path: "user", model: "UserModel", select: "name email" })
             .populate({ path: "restaurant", model: "Restaurant", select: "name address" });
 
-        console.log("Order Data for User:", OrderMenuData);
         return res.status(200).json(OrderMenuData);
     } catch (error) {
         console.error("Error fetching user orders:", error);

@@ -38,7 +38,6 @@ cloudinary.config({
 export const SendOTPForRegistrationUser = async (req: Request, res: Response): Promise<any> => {
     try {
         const { email, contact, name } = req.body;
-        console.log(req.body);
 
         if (!email || !contact || !name) {
             return res.status(400).json({ message: 'All fields are required' });
@@ -71,13 +70,13 @@ export const SendOTPForRegistrationUser = async (req: Request, res: Response): P
         const info = await transporter.sendMail({
             from: process.env.FROM,
             to: email, // Send the email to the user
-            subject: "Welcome to JedheEats!", // Subject line
-            text: `Thank you for registering at JedheEats. Your OTP code is ${otpCode}. It is valid for 10 minutes.`, // Fallback text
+            subject: "Welcome to CraveCourier!", // Subject line
+            text: `Thank you for registering at CraveCourier. Your OTP code is ${otpCode}. It is valid for 10 minutes.`, // Fallback text
             html: `
                 <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-                    <h2 style="color: black; text-align:center;">Welcome to JedheEats!</h2>
+                    <h2 style="color: black; text-align:center;">Welcome to CraveCourier!</h2>
                     <p>Hi ${name},</p>
-                    <p>Thank you for registering at JedheEats. We're excited to have you on board!</p>
+                    <p>Thank you for registering at CraveCourier. We're excited to have you on board!</p>
         
                     <h3 style="margin-top: 30px; color: #333;">Your OTP Code:</h3>
                     <div style="background-color: #f4f4f4; padding: 10px 20px; border-radius: 8px; font-size: 24px; text-align: center; max-width: 400px; margin: auto; font-weight: bold; color: black;">
@@ -96,14 +95,13 @@ export const SendOTPForRegistrationUser = async (req: Request, res: Response): P
                     
                     <p style="margin-top: 30px;">We're here to help you with your food orders! Feel free to explore our menu and place your first order.</p>
                     
-                    <p>Best regards,<br/> The JedheEats Team</p>
+                    <p>Best regards,<br/> The CraveCourier Team</p>
                     
                     <p style="font-size: 12px; color: #888; margin-top: 20px;">If you have any questions, please contact us at support@yourcompany.com.</p>
                 </div>
             `,
         });
         // Optionally, you can also store the OTP code in your database or log it for later verification. 
-        console.log(otpCode);
         return res.status(200).json({ message: "OTP sent successfully Check Your Email... ", otpCode });
 
     } catch (error) {
@@ -121,11 +119,7 @@ export const RegistrationUser = async (req: Request, res: Response): Promise<any
             return res.status(400).json({ message: "Profile Pictuer are missing.😊" })
         }
 
-        console.log("Req File", req.file);
-
         const result = await cloudinary.uploader.upload(req.file!.path);
-
-        console.log("result", result);
 
         if (!name || !email || !contact || !password || !contact || !address || !country || !city) {
             return res.status(400).json({
@@ -163,7 +157,6 @@ export const RegistrationUser = async (req: Request, res: Response): Promise<any
             email: UserData.email
         }
         const token = generateToken(JSON.stringify(payload))
-        console.log(token);
 
         return res.status(200).json({ message: "Registration successful.", token });
     } catch (error) {
@@ -175,7 +168,6 @@ export const RegistrationUser = async (req: Request, res: Response): Promise<any
 export const LoginUser = async (req: Request, res: Response): Promise<any> => {
     try {
         const { email, password } = req.body
-        console.log(req.body);
 
         if (!email || !password) {
             return res.status(400).json({ message: "all filed is the required..." })
@@ -225,11 +217,6 @@ export const UserUpdate = async (req: CustomRequest, res: Response): Promise<any
                 }
             }
         }
-
-        type File = {
-            [fieldname: string]: MulterFile[];
-        }
-
         if (req.file) {
             const result = await cloudinary.uploader.upload(req.file!.path);
             UserUpdate.profilePictuer = result.secure_url
@@ -290,8 +277,6 @@ export const ForgetPassword = async (req: Request, res: Response, next: NextFunc
             return res.status(400).json({ message: "All fields are required" })
         }
 
-        console.log(email);
-
         const EmailCheck = await UserModels.findOne({ email: email })
         if (!EmailCheck) {
             return res.status(400).json({ message: "user not Found..." })
@@ -326,38 +311,72 @@ export const ForgetPassword = async (req: Request, res: Response, next: NextFunc
             const resetLink = `http://localhost:5173/SetNewPassword?token=${token}&email=${encodeURIComponent(email)}`;
 
             // Step 4: Send the email
+            // const info = await transporter.sendMail({
+            //     from: process.env.FROM,
+            //     to: email, // Send the email to the user
+            //     subject: "Password Reset Request - CraveCourier", // Subject line
+            //     text: `Your password reset link is valid for 10 minutes.`, // Fallback text
+            //     html: `
+            //         <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+            //             <h2 style="color: black; text-align:center;">Password Reset Request</h2>
+            //             <p>Hi there,</p>
+            //             <p>We received a request to reset the password for your account at CraveCourier. If you did not request this, please ignore this email.</p>
+                        
+            //             <p>To reset your password, please click the link below:</p>
+            //             <div style="background-color: #f4f4f4; padding: 10px 20px; border-radius: 8px; font-size: 18px; text-align: center; max-width: 400px; margin: auto;">
+            //                 <a href="${resetLink}" style="text-decoration: none; color: #007bff;">Click Reset Password</a>
+            //             </div>
+                        
+            //             <p style="margin-top: 20px;">This link is valid for the next 10 minutes. After that, you'll need to request a new password reset.</p>
+                        
+            //             <h3 style="margin-top: 30px; color: #333;">Account Information:</h3>
+            //             <div style="background-color: #f9f9f9; padding: 10px; border-radius: 5px;">
+            //                 <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+            //                 <p><strong>Time:</strong> ${new Date().toLocaleTimeString()}</p>
+            //             </div>
+                        
+            //             <p style="margin-top: 30px;">Thank you for choosing CraveCourier. We're here to help you with your food orders!</p>
+                        
+            //             <p>Best regards,<br/> The CraveCourier Team</p>
+                        
+            //             <p style="font-size: 12px; color: #888; margin-top: 20px;">If you did not request a password reset, please contact us immediately at CraveCourier@gmail.com.</p>
+            //         </div>
+            //     `,
+            // });
+
             const info = await transporter.sendMail({
                 from: process.env.FROM,
                 to: email, // Send the email to the user
-                subject: "Password Reset Request - [Your Food Order Website]", // Subject line
+                subject: "Password Reset Request - CraveCourier", // Subject line
                 text: `Your password reset link is valid for 10 minutes.`, // Fallback text
                 html: `
-                    <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-                        <h2 style="color: black; text-align:center;">Password Reset Request</h2>
-                        <p>Hi there,</p>
-                        <p>We received a request to reset the password for your account at [Your Food Order Website]. If you did not request this, please ignore this email.</p>
+                    <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                        <h2 style="color: #007bff; text-align: center; margin-bottom: 20px;">Password Reset Request</h2>
+                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Hi there,</p>
+                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">We received a request to reset the password for your account at CraveCourier. If you did not request this, please ignore this email.</p>
                         
-                        <p>To reset your password, please click the link below:</p>
-                        <div style="background-color: #f4f4f4; padding: 10px 20px; border-radius: 8px; font-size: 18px; text-align: center; max-width: 400px; margin: auto;">
-                            <a href="${resetLink}" style="text-decoration: none; color: #007bff;">Reset Password</a>
+                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">To reset your password, please click the link below:</p>
+                        <div style="background-color: #f4f4f4; padding: 15px; border-radius: 8px; text-align: center; margin: 20px auto; max-width: 400px;">
+                            <a href="${resetLink}" style="text-decoration: none; color: #fff; background-color: #007bff; padding: 10px 20px; border-radius: 5px; font-size: 16px; display: inline-block;">Reset Password</a>
                         </div>
                         
-                        <p style="margin-top: 20px;">This link is valid for the next 10 minutes. After that, you'll need to request a new password reset.</p>
+                        <p style="font-size: 16px; line-height: 1.6; margin-top: 20px;">This link is valid for the next 10 minutes. After that, you'll need to request a new password reset.</p>
                         
-                        <h3 style="margin-top: 30px; color: #333;">Account Information:</h3>
-                        <div style="background-color: #f9f9f9; padding: 10px; border-radius: 5px;">
-                            <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-                            <p><strong>Time:</strong> ${new Date().toLocaleTimeString()}</p>
+                        <h3 style="margin-top: 30px; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Account Information:</h3>
+                        <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-top: 10px;">
+                            <p style="font-size: 14px; margin: 0;"><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                            <p style="font-size: 14px; margin: 0;"><strong>Time:</strong> ${new Date().toLocaleTimeString()}</p>
                         </div>
                         
-                        <p style="margin-top: 30px;">Thank you for choosing [Your Food Order Website]. We're here to help you with your food orders!</p>
+                        <p style="font-size: 16px; line-height: 1.6; margin-top: 30px;">Thank you for choosing CraveCourier. We're here to help you with your food orders!</p>
                         
-                        <p>Best regards,<br/> The [Your Food Order Website] Team</p>
+                        <p style="font-size: 16px; line-height: 1.6; margin-top: 20px;">Best regards,<br/><strong>The CraveCourier Team</strong></p>
                         
-                        <p style="font-size: 12px; color: #888; margin-top: 20px;">If you did not request a password reset, please contact us immediately at support@yourcompany.com.</p>
+                        <p style="font-size: 12px; color: #888; margin-top: 20px; line-height: 1.4;">If you did not request a password reset, please contact us immediately at <a href="mailto:CraveCourier@gmail.com" style="color: #007bff; text-decoration: none;">CraveCourier@gmail.com</a>.</p>
                     </div>
                 `,
-            });
+            });            
+
             return res.status(200).json({
                 message: 'Password reset link has been sent to your email. Please check your inbox to reset your password.', resetLink
             });

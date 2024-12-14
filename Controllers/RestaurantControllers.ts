@@ -3,6 +3,7 @@ import Restaurant from "../Models/Restaurant";
 import Order from "../Models/Order";
 import UserModels from "../Models/UserModels";
 import Menus from "../Models/Menus";
+import nodemailer from "nodemailer"
 import { v2 as cloudinary } from 'cloudinary';
 
 interface CustomRequest extends Request {
@@ -166,29 +167,85 @@ export const GetRestaurantOrder = async (req: CustomRequest, res: Response): Pro
 }
 
 //Status Update
-export const statusUpdate = async (req: Request, res: Response): Promise<any> => {
+export const statusUpdate = async (req: CustomRequest, res: Response): Promise<void> => {
     try {
         const OrderId = req.params.id
+        const user = await UserModels.findById(req?.user?.id)
         const { status, menuID } = req.body
-
-        console.log(req.body);
-
         const order = await Order.findById(OrderId)
+
         if (!order) {
-            return res.status(400).json({ message: "Order Not Found..." })
+            res.status(400).json({ message: "Order Not Found..." })
+            return
         }
         order.MenuItemsList.forEach((val) => {
             if (val.menuId == menuID) {
                 val.status = status;
-                console.log(val.status);
             }
         });
 
+        // Set up the email transporter
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            secure: true,
+            port: Number(process.env.NODEMAILER_PORT) || 465,
+            auth: {
+                user: process.env.USER,
+                pass: process.env.PASS,
+            },
+        });
+
+        const info = await transporter.sendMail({
+            from: process.env.FROM,
+            to: user?.email || "pradipjedhe69@gmail.com", // Send the email to the user's email
+            subject: "Menu Details and User Information from CraveCourier!", // Subject line
+            text: `Hello ${user?.name}, 
+            
+        Here are the details:
+        
+        Menu Status: ${status}
+        Menu ID: ${menuID}
+        
+        User Information:
+        Name: ${user?.name}
+        Email: ${user?.email}
+        
+        Thank you for choosing CraveCourier. We're here to provide the best service!`, // Fallback text
+            html: `
+                <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                    <h2 style="color: black; text-align: center;">Menu Details and User Information from CraveCourier!</h2>
+                    <p>Hi ${user?.name},</p>
+                    <p>Thank you for choosing CraveCourier. We're excited to share the details with you:</p>
+                    
+                    <h3 style="margin-top: 30px; color: #333;">Menu Information:</h3>
+                    <div style="background-color: #f9f9f9; padding: 10px; border-radius: 5px;">
+                        <p><strong>Menu Status:</strong> ${status}</p>
+                        <p><strong>Menu ID:</strong> ${menuID}</p>
+                    </div>
+                    
+                    <h3 style="margin-top: 30px; color: #333;">User Information:</h3>
+                    <div style="background-color: #f4f4f4; padding: 10px; border-radius: 5px;">
+                        <p><strong>Name:</strong> ${user?.name}</p>
+                        <p><strong>Email:</strong> ${user?.email}</p>
+                     
+                    </div>
+                    
+                    <p style="margin-top: 30px;">Feel free to explore the menu and place your first order!</p>
+                    
+                    <p>Best regards,<br/> The CraveCourier Team</p>
+                    
+                    <p style="font-size: 12px; color: #888; margin-top: 20px;">If you have any questions, please contact us at support@yourcompany.com.</p>
+                </div>
+            `,
+        });
+
         await order.save();
-        return res.status(200).json({ message: "Order Status Update..." })
+        res.status(200).json({ message: "Order Status Update..." })
+        return
     } catch (error) {
         console.log(error);
-        return res.status(501).json({ message: "Internal Server Error..." })
+        res.status(501).json({ message: "Internal Server Error..." })
+        return
     }
 }
 
