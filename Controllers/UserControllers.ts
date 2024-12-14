@@ -226,7 +226,7 @@ export const UserUpdate = async (req: CustomRequest, res: Response): Promise<any
             }
         }
 
-        type Files = {
+        type File = {
             [fieldname: string]: MulterFile[];
         }
 
@@ -250,7 +250,7 @@ export const UserUpdate = async (req: CustomRequest, res: Response): Promise<any
     } catch (error) {
         console.log(error);
         return res.status(501).json({ message: "Internal Server Error.." })
-
+        return
     }
 }
 
