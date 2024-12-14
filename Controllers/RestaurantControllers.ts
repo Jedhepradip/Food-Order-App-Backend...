@@ -105,7 +105,7 @@ export const GetAllRestaurantData = async (req: Request, res: Response): Promise
 }
 
 // Restaurant Updated Admin Or User 
-export const RestaurantUpdate = async (req: Request, res: Response): Promise<any> => {
+export const RestaurantUpdate = async (req: Request, res: Response): Promise<void> => {
     try {
         const RestaurantId = req.params?.id
         const { restaurantName, city, country, deliveryTime, cuisines, RestaurantBanner } = req.body;
@@ -113,7 +113,8 @@ export const RestaurantUpdate = async (req: Request, res: Response): Promise<any
         const RestaurantFind = await Restaurant.findById(RestaurantId)
 
         if (!RestaurantFind) {
-            return res.status(400).json({ message: "Restaurant Not Found..." })
+            res.status(400).json({ message: "Restaurant Not Found..." })
+            return
         }
 
         type Files = {
@@ -136,11 +137,13 @@ export const RestaurantUpdate = async (req: Request, res: Response): Promise<any
         if (!city) RestaurantReq.city = RestaurantFind.city
 
         const RestaurantData = await Restaurant.findByIdAndUpdate(RestaurantId, RestaurantReq, { new: true });
-        return res.status(200).json({ message: "Restaurant Updated Successfully...", RestaurantData })
+        res.status(200).json({ message: "Restaurant Updated Successfully...", RestaurantData })
+        return
 
     } catch (error) {
         console.log(error);
-        return res.status(501).json({ message: "Internal Server Error..." })
+        res.status(501).json({ message: "Internal Server Error..." })
+        return
     }
 }
 

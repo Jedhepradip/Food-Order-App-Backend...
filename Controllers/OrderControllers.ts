@@ -4,6 +4,7 @@ import nodemailer from "nodemailer"
 import UserModels from "../Models/UserModels";
 import Menus from "../Models/Menus";
 import Order from "../Models/Order";
+import Restaurant from "../Models/Restaurant";
 import { log } from "console";
 
 interface CustomRequest extends Request {
@@ -58,6 +59,11 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
             return res.status(404).json({ message: "Menu items not found" });
         }
 
+        const restaurantData = await Restaurant.findById(restaurantId)
+        if (!restaurantData) {
+            return res.status(400).json({ message: "Restaurant Not Found..." })
+        }
+
         const OrderPayment = new Order({
             user: req.user?.id,
             totalAmount: totalAmountInPaise / 100,
@@ -91,15 +97,18 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
             },
         });
 
-        // Prepare order details
-        const orderId = "ORD12345"; // Example order ID
-        const orderDate = new Date(); // Example order date
-        const menuName = "Pizza Margherita"; // Example menu name
-        const menuPrice = 12.99; // Example menu price
-        const restaurantName = "JedheEats Delight"; // Example restaurant name
-        const totalPrice = 15.49; // Example total price (including taxes)
-        const companyName = "JedheEats"; // Example company name
-        const orderStatus = "Preparing"; // Example order status (e.g., Preparing, Out for Delivery, Delivered)
+        const orderId = OrderPayment._id;
+        const orderDate = new Date();
+        const menuName = MenuItem[0]?.Menu?.name;
+        const menuPrice = MenuItem[0]?.Menu?.price;
+        const restaurantName = restaurantData.restaurantName;
+        const totalPrice = totalAmountInPaise / 100;
+        const companyName = "CraveCourier";
+        const orderStatus = "Pending";
+        const userLocation = user.address
+        const deliveryTimeToRestaurant: number = parseFloat(restaurantData.deliveryTime);
+        const estimatedDeliveryDate = new Date(orderDate.getTime() + deliveryTimeToRestaurant * 60000);
+        const estimatedDeliveryTime = estimatedDeliveryDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         const info = await transporter.sendMail({
             from: process.env.FROM,
@@ -112,11 +121,14 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
                    Restaurant: ${restaurantName}\n
                    Total: $${totalPrice.toFixed(2)}\n
                    Order Date: ${orderDate.toLocaleDateString()} ${orderDate.toLocaleTimeString()}\n
-                   Order Status: ${orderStatus}\n\n
+                   Order Status: ${orderStatus}\n
+                   Delivery Location: ${userLocation}\n
+                   Restaurant to Delivery Location: ${deliveryTimeToRestaurant}\n
+                   Estimated Delivery Time: ${estimatedDeliveryTime}\n\n
                    We're excited to prepare your meal!`,
             html: `
                 <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-                    <h2 style="color: black; text-align:center;">Thank you for your order at ${companyName}!</h2>
+                    <h2 style="color: black; text-align:center;">Thank You For Your Order At ${companyName}!</h2>
                     <p>Hi ${name},</p>
                     <p>Your order has been successfully placed. Below are the details of your order:</p>
                     
@@ -129,8 +141,11 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
                         <p><strong>Total:</strong> $${totalPrice.toFixed(2)}</p>
                         <p><strong>Order Date:</strong> ${orderDate.toLocaleDateString()} ${orderDate.toLocaleTimeString()}</p>
                         <p><strong>Order Status:</strong> <span style="color: #007BFF;">${orderStatus}</span></p>
+                        <p><strong>Delivery Location:</strong> ${userLocation}</p>
+                        <p><strong>Restaurant to Delivery Location:</strong> ${deliveryTimeToRestaurant}</p>
+                        <p><strong>Estimated Delivery Time:</strong> <span style="color: green;">${estimatedDeliveryTime}</span></p>
                     </div>
-        
+            
                     <p style="margin-top: 30px;">We’re excited to prepare your meal and deliver it to you soon. If you have any questions or special requests, feel free to contact us!</p>
                     
                     <p>Best regards,<br/> The ${companyName} Team</p>
@@ -139,6 +154,7 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
                 </div>
             `,
         });
+
 
         await OrderPayment.save();
         return res.status(200).json({ clientSecret: paymentIntent.client_secret });
