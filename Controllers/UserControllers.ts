@@ -319,7 +319,7 @@ export const ForgetPassword = async (req: Request, res: Response, next: NextFunc
             // Step 3: Create the password reset link
             const resetLink = `https://cravecourier1.netlify.app/SetNewPassword?token=${token}&email=${encodeURIComponent(email)}`;
 
-            console.log(resetLink);
+            console.log("resetLink :", resetLink);
 
             const info = await transporter.sendMail({
                 from: process.env.FROM,
@@ -328,6 +328,7 @@ export const ForgetPassword = async (req: Request, res: Response, next: NextFunc
                 text: `Your password reset link is valid for 10 minutes.`, // Fallback text
                 html: `
                     <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                    <h4> ${resetLink} </h4>
                         <h2 style="color: #007bff; text-align: center; margin-bottom: 20px;">Password Reset Request</h2>
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">Hi there,</p>
                         <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">We received a request to reset the password for your account at CraveCourier. If you did not request this, please ignore this email.</p>
