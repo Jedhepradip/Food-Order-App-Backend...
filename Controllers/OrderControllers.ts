@@ -111,7 +111,7 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
 
         const info = await transporter.sendMail({
             from: process.env.FROM,
-            to: "pradipjedhe69@gmail.com", // Send the email to the user
+            to: user.email, // Send the email to the user
             subject: `Order Confirmation - ${companyName}`, // Subject line
             text: `Thank you for your order at ${companyName}!\n\n
                    Order ID: ${orderId}\n
