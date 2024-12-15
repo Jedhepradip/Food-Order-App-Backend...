@@ -35,11 +35,11 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
         };
 
         const totalAmountInPaise = Math.round(calculateTotal() * 100);
-        if (totalAmountInPaise < 5000) {
-            return res.status(400).json({
-                message: "Order total is too low to process payment.",
-            });
-        }
+        // if (totalAmountInPaise < 5000) {
+        //     return res.status(400).json({
+        //         message: "Order total is too low to process payment.",
+        //     });
+        // }
 
         const paymentIntent = await stripe.paymentIntents.create({
             amount: totalAmountInPaise,
