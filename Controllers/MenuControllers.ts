@@ -129,7 +129,6 @@ export const MenuUpdate = async (req: Request, res: Response): Promise<any> => {
         if (req.file) {
             const result = await cloudinary.uploader.upload(req.file!.path);
             menubody.menuPictuer = result.secure_url
-
         } else {
             menubody.menuPictuer = menu.menuPictuer
         }
