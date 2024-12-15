@@ -17,6 +17,7 @@ interface UserModelInterfase extends Document {
     resetToken: string,
     profilePictuer: string,
     resetTokenExpiration: number
+    idAdmin:Boolean,
 }
 const UserData: mongoose.Schema<UserModelInterfase> = new mongoose.Schema({
     name: {
@@ -45,6 +46,9 @@ const UserData: mongoose.Schema<UserModelInterfase> = new mongoose.Schema({
     },
     country: {
         type: String,
+    },
+    idAdmin:{
+        type:Boolean,
     },
     profilePictuer: {
         type: String,

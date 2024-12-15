@@ -3,7 +3,6 @@ import MenusModels from "../Models/Menus";
 import Restaurant from "../Models/Restaurant";
 import { v2 as cloudinary } from 'cloudinary';
 
-
 interface CustomRequest extends Request {
     user?: {
         id: string;  // Define the specific type you expect for 'user.id'

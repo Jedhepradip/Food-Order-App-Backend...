@@ -139,6 +139,7 @@ export const RegistrationUser = async (req: Request, res: Response): Promise<any
 
         const passwordhash = await bcrypt.hash(password, 11)
 
+
         const UserData = new UserModels({
             name,
             email,
@@ -146,10 +147,18 @@ export const RegistrationUser = async (req: Request, res: Response): Promise<any
             address,
             country,
             city,
+            idAdmin: false,
             password: passwordhash,
             profilePictuer: result.secure_url,
         })
         await UserData.save()
+
+
+        if (UserData.email === "pradipjedhe69@gmail.com") {
+            UserData.idAdmin = true;
+        } else {
+            UserData.idAdmin = false; // Ensure a default value for other users
+        }
 
         const payload: UserPayload = {
             id: UserData._id,
@@ -308,41 +317,9 @@ export const ForgetPassword = async (req: Request, res: Response, next: NextFunc
             await user.save();
 
             // Step 3: Create the password reset link
-            const resetLink = `https://cravecourier1.netlify.app/SetNewPassword?token=${token}&email=${encodeURIComponent(email)}`;
+            const resetLink = `https://cravecourier1.netlify.app/SetNewPassword/?token=${token}&email=${encodeURIComponent(email)}`;
 
-            // Step 4: Send the email
-            // const info = await transporter.sendMail({
-            //     from: process.env.FROM,
-            //     to: email, // Send the email to the user
-            //     subject: "Password Reset Request - CraveCourier", // Subject line
-            //     text: `Your password reset link is valid for 10 minutes.`, // Fallback text
-            //     html: `
-            //         <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-            //             <h2 style="color: black; text-align:center;">Password Reset Request</h2>
-            //             <p>Hi there,</p>
-            //             <p>We received a request to reset the password for your account at CraveCourier. If you did not request this, please ignore this email.</p>
-                        
-            //             <p>To reset your password, please click the link below:</p>
-            //             <div style="background-color: #f4f4f4; padding: 10px 20px; border-radius: 8px; font-size: 18px; text-align: center; max-width: 400px; margin: auto;">
-            //                 <a href="${resetLink}" style="text-decoration: none; color: #007bff;">Click Reset Password</a>
-            //             </div>
-                        
-            //             <p style="margin-top: 20px;">This link is valid for the next 10 minutes. After that, you'll need to request a new password reset.</p>
-                        
-            //             <h3 style="margin-top: 30px; color: #333;">Account Information:</h3>
-            //             <div style="background-color: #f9f9f9; padding: 10px; border-radius: 5px;">
-            //                 <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-            //                 <p><strong>Time:</strong> ${new Date().toLocaleTimeString()}</p>
-            //             </div>
-                        
-            //             <p style="margin-top: 30px;">Thank you for choosing CraveCourier. We're here to help you with your food orders!</p>
-                        
-            //             <p>Best regards,<br/> The CraveCourier Team</p>
-                        
-            //             <p style="font-size: 12px; color: #888; margin-top: 20px;">If you did not request a password reset, please contact us immediately at CraveCourier@gmail.com.</p>
-            //         </div>
-            //     `,
-            // });
+            console.log(resetLink);
 
             const info = await transporter.sendMail({
                 from: process.env.FROM,
@@ -375,7 +352,7 @@ export const ForgetPassword = async (req: Request, res: Response, next: NextFunc
                         <p style="font-size: 12px; color: #888; margin-top: 20px; line-height: 1.4;">If you did not request a password reset, please contact us immediately at <a href="mailto:CraveCourier@gmail.com" style="color: #007bff; text-decoration: none;">CraveCourier@gmail.com</a>.</p>
                     </div>
                 `,
-            });            
+            });
 
             return res.status(200).json({
                 message: 'Password reset link has been sent to your email. Please check your inbox to reset your password.', resetLink
