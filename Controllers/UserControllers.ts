@@ -308,7 +308,7 @@ export const ForgetPassword = async (req: Request, res: Response, next: NextFunc
             await user.save();
 
             // Step 3: Create the password reset link
-            const resetLink = `http://localhost:5173/SetNewPassword?token=${token}&email=${encodeURIComponent(email)}`;
+            const resetLink = `https://cravecourier1.netlify.app/SetNewPassword?token=${token}&email=${encodeURIComponent(email)}`;
 
             // Step 4: Send the email
             // const info = await transporter.sendMail({
