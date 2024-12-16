@@ -153,11 +153,12 @@ export const RegistrationUser = async (req: Request, res: Response): Promise<any
         })
         await UserData.save()
 
-
         if (UserData.email === "pradipjedhe69@gmail.com") {
             UserData.idAdmin = true;
+            await UserData.save()
         } else {
             UserData.idAdmin = false; // Ensure a default value for other users
+            await UserData.save()
         }
 
         const payload: UserPayload = {
