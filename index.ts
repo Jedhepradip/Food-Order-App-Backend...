@@ -6,6 +6,8 @@ import Meun from "./Router/MenuRouter"
 import Order from "./Router/OrderRouter"
 import UserRouter from "./Router/UserRouter";
 import Restaurant from "./Router/RestaurantRouter"
+import PaymentRestaurant from "./Router/RestaurantRouter"
+
 import { connectDB } from "./Database/db";
 
 const app = express();
@@ -24,6 +26,7 @@ app.use("/api-Meun", Meun)
 app.use("/api-Order", Order)
 app.use("/api-user", UserRouter);
 app.use("/api-restaurant", Restaurant)
+app.use("/api-Payment-restaurant", PaymentRestaurant)
 
 app.listen(process.env.PORT, (): void => {
     console.log(`Server Running On http://localhost:${process.env.PORT}`);
