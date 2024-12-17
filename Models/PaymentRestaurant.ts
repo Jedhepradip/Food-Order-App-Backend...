@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from "mongoose";
 // Interface for TypeScript
 export interface IPaymentRestaurant extends Document {
     user: mongoose.Types.ObjectId[]; // Array of referenced User IDs
-    totalAmount: number;            // Total payment amount
+    totaleAmount: number;            // Total payment amount
 }
 
 const PaymentRestaurantSchema: mongoose.Schema<IPaymentRestaurant> = new mongoose.Schema(
@@ -15,7 +15,7 @@ const PaymentRestaurantSchema: mongoose.Schema<IPaymentRestaurant> = new mongoos
                 required: true,
             },
         ],
-        totalAmount: {
+        totaleAmount: {
             type: Number,
             required: true,
         },
