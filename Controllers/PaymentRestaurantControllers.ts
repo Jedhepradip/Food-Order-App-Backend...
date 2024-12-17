@@ -50,12 +50,12 @@ export const PaymentRestaurant = async (req: CustomRequest, res: Response): Prom
         // Example Email Send (optional)
         await transporter.sendMail({
             from: process.env.FROM,
-            to: userdata?.email, // Replace with user email
+            to:  userdata?.email, // Replace with user email
             subject: "Payment Confirmation To CraveCouries.com",
             text: `
             Dear ${userdata?.name},
         
-            We are pleased to inform you that your payment of INR 5000 has been successfully processed. Thank you for choosing CraveCouries!
+            We are pleased to inform you that your payment of INR 50000 has been successfully processed. Thank you for choosing CraveCouries!
         
             Here are your order details:
             --------------------------------
@@ -97,7 +97,7 @@ export const PaymentGetAllData = async (req: CustomRequest, res: Response): Prom
         const userID = req.user?.id;
         const userPayments = await PaymentRestaurantModel.find({ user: userID })
             .populate({ path: "user", select: "name email" });
-        console.log("userPayments :", userPayments);
+        console.log("userPayments :", userPayments);        
         res.status(200).json(userPayments);
         return
     } catch (error) {
