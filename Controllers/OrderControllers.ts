@@ -18,6 +18,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
 
 export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Promise<any> => {
     try {
+        console.log("R",req.body);
+        
         const { email, name, country, address, expiry, cvc, MenuItem, restaurantId, MenuID } = req.body;
 
         if (!email || !name || !country || !address || !expiry || !cvc || !MenuItem) {

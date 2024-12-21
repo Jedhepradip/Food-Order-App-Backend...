@@ -50,7 +50,7 @@ export const PaymentRestaurant = async (req: CustomRequest, res: Response): Prom
         // Example Email Send (optional)
         await transporter.sendMail({
             from: process.env.FROM,
-            to:  userdata?.email, // Replace with user email
+            to: userdata?.email, // Replace with user email
             subject: "Payment Confirmation To CraveCouries.com",
             text: `
             Dear ${userdata?.name},
@@ -95,13 +95,18 @@ export const PaymentRestaurant = async (req: CustomRequest, res: Response): Prom
 export const PaymentGetAllData = async (req: CustomRequest, res: Response): Promise<void> => {
     try {
         const userID = req.user?.id;
+        if (!userID) {
+            res.status(401).json({ message: "Unauthorized" });
+            return;
+        }
+
         const userPayments = await PaymentRestaurantModel.find({ user: userID })
             .populate({ path: "user", select: "name email" });
-        console.log("userPayments :", userPayments);        
+
         res.status(200).json(userPayments);
-        return
     } catch (error) {
         console.error("Error fetching payment data:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 };
+
