@@ -1,15 +1,5 @@
 import mongoose from "mongoose";
 
-interface DeliveryDetails {
-    name: string;
-    email: string;
-    address: string;
-    city: string;
-    country: string,
-    expiry: string,
-    cvc: string,
-}
-
 interface CartItems {
     menuId: mongoose.Schema.Types.ObjectId;
     name: string;
@@ -23,7 +13,6 @@ interface CartItems {
 interface Order extends mongoose.Document {
     user: mongoose.Schema.Types.ObjectId;
     restaurant: mongoose.Schema.Types.ObjectId;
-    deliveryDetails: DeliveryDetails;
     MenuItemsList: CartItems[];
     totalAmount: number;
 }
@@ -38,33 +27,7 @@ const OrderSchema: mongoose.Schema<Order> = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Restaurant",
         required: true,
-    }],
-    deliveryDetails: {
-        email: {
-            type: String,
-            required: true,
-        },
-        name: {
-            type: String,
-            required: true,
-        },
-        address: {
-            type: String,
-            required: true,
-        },
-        country: {
-            type: String,
-            required: true,
-        },
-        expiry: {
-            type: String,
-            required: true,
-        },
-        cvc: {
-            type: String,
-            required: true,
-        }
-    },
+    }],   
     MenuItemsList: [
         {
             menuId: {
