@@ -18,6 +18,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
 
 export const PaymentRestaurant = async (req: CustomRequest, res: Response): Promise<void> => {
     try {
+
+        console.log("Pradip");
+        
         const userID = req.user?.id;
         const { totaleAmount } = req.body
         const userdata = await UserModels.findById(userID)
@@ -111,6 +114,7 @@ export const PaymentRestaurant = async (req: CustomRequest, res: Response): Prom
 
 export const PaymentGetAllData = async (req: CustomRequest, res: Response): Promise<void> => {
     try {
+        console.log("Pradip");
         const userID = req.user?.id;
         if (!userID) {
             res.status(401).json({ message: "Unauthorized" });
