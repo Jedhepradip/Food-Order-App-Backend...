@@ -21,13 +21,31 @@ export const PaymentRestaurant = async (req: CustomRequest, res: Response): Prom
         const userID = req.user?.id;
         const { totaleAmount } = req.body
         const userdata = await UserModels.findById(userID)
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: totaleAmount, // Example amount: $50.00 in the smallest unit (cents)
-            currency: "inr",
-            payment_method_types: ["card"],
-            metadata: {
-                userID: userID || "unknown", // Use "unknown" as a fallback value
+        const minimumPriceInINR = 49999; // ₹50.00
+        const adjustedPrice = 49999 < minimumPriceInINR ? minimumPriceInINR : 49999;
+
+        const lineItems = [
+            {
+                price_data: {
+                    currency: "inr",
+                    product_data: {
+                        name: userdata?.name, // User's name
+                        description: `User's email: ${userdata?.email}`, // User's email in description
+                        images: [userdata?.profilePictuer], // User's profile picture
+                    },
+                    unit_amount: adjustedPrice * 100, // Amount in smallest currency unit (paise for INR)
+                },
+                quantity: 1, // Quantity can be changed if needed
             },
+        ];
+
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ["card"],
+            // line_items: lineItems, // Your dynamic line items
+            line_items: lineItems as Stripe.Checkout.SessionCreateParams.LineItem[],
+            mode: "payment", // 'payment' mode for a one-time payment
+            success_url: "http://localhost:5173/OrderPage",
+            cancel_url: "http://localhost:5173/CancelPaymentPage",
         });
 
         const paymenttorestaurent = new PaymentRestaurantModel({
@@ -83,9 +101,8 @@ export const PaymentRestaurant = async (req: CustomRequest, res: Response): Prom
             `
         });
 
-        res.status(200).json({
-            message: "Payment processed successfully", clientSecret: paymentIntent.client_secret,
-        });
+        res.status(200).json({ id: session.id });
+        return
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal Server Error" });
