@@ -7,19 +7,25 @@ interface CartItem {
 
 interface UserModelInterfase extends Document {
     items: CartItem[],
+    role: string,
     city: string,
     name: string,
     email: string,
     contact: string,
+    idAdmin: Boolean,
     address: string,
     country: string,
     password: string,
     resetToken: string,
     profilePictuer: string,
     resetTokenExpiration: number
-    idAdmin:Boolean,
 }
 const UserData: mongoose.Schema<UserModelInterfase> = new mongoose.Schema({
+    role: {
+        type: String,
+        enum: ['RestroRecruit', 'customer'],
+        required: true,
+    },
     name: {
         type: String,
         required: true,
@@ -47,8 +53,8 @@ const UserData: mongoose.Schema<UserModelInterfase> = new mongoose.Schema({
     country: {
         type: String,
     },
-    idAdmin:{
-        type:Boolean,
+    idAdmin: {
+        type: Boolean,
     },
     profilePictuer: {
         type: String,

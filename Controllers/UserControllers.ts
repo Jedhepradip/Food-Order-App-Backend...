@@ -113,7 +113,7 @@ export const SendOTPForRegistrationUser = async (req: Request, res: Response): P
 // Ensure similar changes for other handlers
 export const RegistrationUser = async (req: Request, res: Response): Promise<any> => {
     try {
-        const { name, email, contact, password, address, country, city } = req.body;
+        const { name, email, contact, password, address, country, city, role } = req.body;
 
         if (!req.file) {
             return res.status(400).json({ message: "Profile Pictuer are missing.😊" })
@@ -121,7 +121,7 @@ export const RegistrationUser = async (req: Request, res: Response): Promise<any
 
         const result = await cloudinary.uploader.upload(req.file!.path);
 
-        if (!name || !email || !contact || !password || !contact || !address || !country || !city) {
+        if (!name || !email || !contact || !password || !contact || !address || !country || !city || !role) {
             return res.status(400).json({
                 message: "Oops! It looks like some details are missing.😊"
             });
@@ -139,14 +139,14 @@ export const RegistrationUser = async (req: Request, res: Response): Promise<any
 
         const passwordhash = await bcrypt.hash(password, 11)
 
-
         const UserData = new UserModels({
+            city,
+            role,
             name,
             email,
             contact,
             address,
             country,
-            city,
             idAdmin: false,
             password: passwordhash,
             profilePictuer: result.secure_url,
@@ -177,9 +177,9 @@ export const RegistrationUser = async (req: Request, res: Response): Promise<any
 
 export const LoginUser = async (req: Request, res: Response): Promise<any> => {
     try {
-        const { email, password } = req.body
+        const { email, password,role } = req.body
 
-        if (!email || !password) {
+        if (!email || !password || !role) {
             return res.status(400).json({ message: "all filed is the required..." })
         }
 
@@ -193,6 +193,9 @@ export const LoginUser = async (req: Request, res: Response): Promise<any> => {
             return res.status(400).json({ message: "Incorrect Password..." })
         }
 
+        user.role = role; // Assign the new role value
+        await user.save(); // Save the user with the updated role
+        
         const payloed: UserPayload = {
             id: user._id,
             name: user.name,
