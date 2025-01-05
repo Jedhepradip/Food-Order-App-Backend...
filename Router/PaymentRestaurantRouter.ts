@@ -6,4 +6,4 @@
     router.post("/Payment/Restaurant/Data", jwtMiddleware, PaymentRestaurant)
     router.get("/Payment/Get/Info", jwtMiddleware, PaymentGetAllData);
 
-    export default router;
+    export default router;9
