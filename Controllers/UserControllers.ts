@@ -177,7 +177,7 @@ export const RegistrationUser = async (req: Request, res: Response): Promise<any
 
 export const LoginUser = async (req: Request, res: Response): Promise<any> => {
     try {
-        const { email, password,role } = req.body
+        const { email, password, role } = req.body
 
         if (!email || !password || !role) {
             return res.status(400).json({ message: "all filed is the required..." })
@@ -193,9 +193,8 @@ export const LoginUser = async (req: Request, res: Response): Promise<any> => {
             return res.status(400).json({ message: "Incorrect Password..." })
         }
 
-        user.role = role; // Assign the new role value
-        await user.save(); // Save the user with the updated role
-        
+        if (role !== user?.role) return res.status(400).json({ message: "Account doesn't exist with current role..." })
+
         const payloed: UserPayload = {
             id: user._id,
             name: user.name,

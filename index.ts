@@ -6,7 +6,7 @@ import Meun from "./Router/MenuRouter"
 import Order from "./Router/OrderRouter"
 import UserRouter from "./Router/UserRouter";
 import Restaurant from "./Router/RestaurantRouter"
-import RestaurantPayment from "./Router/RestaurantRouter"
+import RestaurantPayment from "./Router/PaymentRestaurantRouter"
 
 import { connectDB } from "./Database/db";
 

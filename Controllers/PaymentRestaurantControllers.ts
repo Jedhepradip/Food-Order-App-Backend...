@@ -20,9 +20,7 @@ export const PaymentRestaurant = async (req: CustomRequest, res: Response): Prom
     try {
 
         console.log("Pradip");
-        
         const userID = req.user?.id;
-        const { totaleAmount } = req.body
         const userdata = await UserModels.findById(userID)
         const minimumPriceInINR = 49999; // ₹50.00
         const adjustedPrice = 49999 < minimumPriceInINR ? minimumPriceInINR : 49999;
@@ -30,29 +28,41 @@ export const PaymentRestaurant = async (req: CustomRequest, res: Response): Prom
         const lineItems = [
             {
                 price_data: {
+                    currency: "inr",  // Currency in INR
+                    product_data: {
+                        name: userdata?.name || "Unknown User",  // User's name, fallback to "Unknown User"
+                        description: `User's email: ${userdata?.email || "Not Provided"}`,  // User's email in description, fallback if email is missing
+                        images: [userdata?.profilePictuer],  // User's profile picture, fallback to a default image
+                    },
+                    unit_amount: adjustedPrice * 100,  // Amount in smallest currency unit (paise for INR)
+                },
+                quantity: 1,  // Quantity can be adjusted if needed
+            },
+            {
+                price_data: {
                     currency: "inr",
                     product_data: {
-                        name: userdata?.name, // User's name
-                        description: `User's email: ${userdata?.email}`, // User's email in description
-                        images: [userdata?.profilePictuer], // User's profile picture
+                        name: "CraveCoiures Website Fee",  // Descriptive product name for the fee
+                        description: `Total amount to pay: ₹${adjustedPrice}`,  // Description showing the total fee to be paid
                     },
-                    unit_amount: adjustedPrice * 100, // Amount in smallest currency unit (paise for INR)
+                    unit_amount: 50000 * 100,  // Fee amount in paise (₹50000)
                 },
-                quantity: 1, // Quantity can be changed if needed
-            },
+                quantity: 1,  // Quantity can be adjusted if needed
+            }
         ];
+
 
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             // line_items: lineItems, // Your dynamic line items
             line_items: lineItems as Stripe.Checkout.SessionCreateParams.LineItem[],
             mode: "payment", // 'payment' mode for a one-time payment
-            success_url: "http://localhost:5173/OrderPage",
+            success_url: "http://localhost:5173/RestaurantPages",
             cancel_url: "http://localhost:5173/CancelPaymentPage",
         });
 
         const paymenttorestaurent = new PaymentRestaurantModel({
-            totaleAmount,
+            totaleAmount: adjustedPrice,
             user: req.user?.id
         })
 
