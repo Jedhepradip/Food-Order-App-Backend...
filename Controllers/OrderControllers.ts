@@ -35,7 +35,7 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
         if (!restaurantData) {
             return res.status(400).json({ message: "Restaurant Not Found..." })
         }
-
+    
         const minimumPriceInINR = price; // ₹50.00
         const adjustedPrice = price < minimumPriceInINR ? minimumPriceInINR : price;
 
