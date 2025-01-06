@@ -58,8 +58,8 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
             payment_method_types: ["card"],
             line_items: lineItems, // Pass the array here
             mode: "payment",
-            success_url: "http://localhost:5173/OrderPage",
-            cancel_url: "http://localhost:5173/CancelPaymentPage",
+            success_url: "https://cravecourier1.netlify.app/OrderPage",
+            cancel_url: "https://cravecourier1.netlify.app/CancelPaymentPage",
         });
 
         const OrderPayment = new Order({
