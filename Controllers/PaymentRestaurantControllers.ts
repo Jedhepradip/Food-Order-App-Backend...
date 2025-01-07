@@ -56,8 +56,8 @@ export const PaymentRestaurant = async (req: CustomRequest, res: Response): Prom
             // line_items: lineItems, // Your dynamic line items
             line_items: lineItems as Stripe.Checkout.SessionCreateParams.LineItem[],
             mode: "payment", // 'payment' mode for a one-time payment
-            success_url: "http://localhost:5173/RestaurantPages",
-            cancel_url: "http://localhost:5173/CancelPaymentPage",
+            success_url: "https://cravecourier1.netlify.app/RestaurantPages",
+            cancel_url: "https://cravecourier1.netlify.app/CancelPaymentPage",
         });
 
         const paymenttorestaurent = new PaymentRestaurantModel({
