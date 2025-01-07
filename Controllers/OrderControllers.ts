@@ -163,6 +163,9 @@ export const OrderToMenuPayment0 = async (req: CustomRequest, res: Response): Pr
             return res.status(400).json({ message: "Invalid MenuItem data" });
         }
 
+        console.log("req.body ", req.body);
+
+
         const calculateItemTotal = (price: number, quantity: number) => price * quantity;
         const calculateTotal = (): number => {
             const total = MenuItem?.reduce(
@@ -174,8 +177,6 @@ export const OrderToMenuPayment0 = async (req: CustomRequest, res: Response): Pr
         };
 
         const totalAmountInPaise = Math.round(calculateTotal() * 100);
-
-
         const paymentIntent = await stripe.paymentIntents.create({
             amount: totalAmountInPaise,
             currency: "inr",
@@ -220,6 +221,8 @@ export const OrderToMenuPayment0 = async (req: CustomRequest, res: Response): Pr
                 status: "Pending",
             })),
         });
+
+        await OrderPayment.save();
 
         const transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
@@ -289,7 +292,6 @@ export const OrderToMenuPayment0 = async (req: CustomRequest, res: Response): Pr
             `,
         });
 
-        await OrderPayment.save();
         return res.status(200).json({ clientSecret: paymentIntent.client_secret });
     } catch (error) {
         console.error("Error creating payment intent:", error);
