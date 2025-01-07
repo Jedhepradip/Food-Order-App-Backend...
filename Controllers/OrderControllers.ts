@@ -35,7 +35,7 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
         if (!restaurantData) {
             return res.status(400).json({ message: "Restaurant Not Found..." })
         }
-    
+
         const minimumPriceInINR = price; // ₹50.00
         const adjustedPrice = price < minimumPriceInINR ? minimumPriceInINR : price;
 
@@ -326,6 +326,8 @@ export const AllOrderDataShow = async (req: CustomRequest, res: Response): Promi
         if (!OrderAll) {
             return res.status(400).json({ message: "Order is Not Find..." })
         }
+        console.log("OrderAll :", OrderAll);
+
         return res.status(200).json(OrderAll)
     } catch (error) {
         console.error("Error fetching user orders:", error);
