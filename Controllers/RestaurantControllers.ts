@@ -130,6 +130,7 @@ export const RestaurantUpdate = async (req: Request, res: Response): Promise<voi
         }
 
         RestaurantReq.cuisines = RestaurantReq.cuisines.split(" ")
+        RestaurantReq.cuisines = RestaurantReq.cuisines.filter((item: string) => item.trim() !== '');
 
         if (!restaurantName) RestaurantReq.restaurantName = RestaurantFind.restaurantName
         if (!deliveryTime) RestaurantReq.deliveryTime = RestaurantFind.deliveryTime
