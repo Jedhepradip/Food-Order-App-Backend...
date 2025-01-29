@@ -50,7 +50,6 @@ export const PaymentRestaurant = async (req: CustomRequest, res: Response): Prom
             }
         ];
 
-
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             // line_items: lineItems, // Your dynamic line items
@@ -66,7 +65,6 @@ export const PaymentRestaurant = async (req: CustomRequest, res: Response): Prom
         })
 
         await paymenttorestaurent.save()
-        // Nodemailer Transporter
         const transporter = nodemailer.createTransport({
             host: "smtp.gmail.com",
             secure: true,
