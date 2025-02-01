@@ -38,16 +38,17 @@ cloudinary.config({
 export const SendOTPForRegistrationUser = async (req: Request, res: Response): Promise<any> => {
     try {
         const { email, contact, name } = req.body;
+        console.log("req.body",req.body);
 
         if (!email || !contact || !name) {
             return res.status(400).json({ message: 'All fields are required' });
         }
-        const emailCheck = await UserModels.findOne({ email });
+        const emailCheck = await UserModels.findOne({ email: email });
         if (emailCheck) {
             return res.status(400).json({ message: "User already exists with this email." });
         }
 
-        const contactCheck = await UserModels.findOne({ contact });
+        const contactCheck = await UserModels.findOne({ contact: contact });
         if (contactCheck) {
             return res.status(400).json({ message: "User already exists with this contact." });
         }
@@ -64,14 +65,13 @@ export const SendOTPForRegistrationUser = async (req: Request, res: Response): P
         });
 
         // Send OTP email
-        const otpCode = Math.floor(100000 + Math.random() * 900000); // Generates a 6-digit OTP
-        console.log("OTP Code :", otpCode);
+        const otpCode = Math.floor(100000 + Math.random() * 900000); // Generates a 6-digit OTP  
 
-        const info = await transporter.sendMail({
-            from: process.env.FROM,
-            to: email, // Send the email to the user
-            subject: "Welcome to CraveCourier!", // Subject line
-            text: `Thank you for registering at CraveCourier. Your OTP code is ${otpCode}. It is valid for 10 minutes.`, // Fallback text
+        const mailOptions = {
+            from: process.env.EMAIL_FROM, // Sender email
+            to: email,
+            subject: "Welcome to CraveCourier!",
+            text: `Thank you for registering at CraveCourier. Your OTP code is ${otpCode}. It is valid for 10 minutes.`,
             html: `
                 <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
                     <h2 style="color: black; text-align:center;">Welcome to CraveCourier!</h2>
@@ -100,7 +100,11 @@ export const SendOTPForRegistrationUser = async (req: Request, res: Response): P
                     <p style="font-size: 12px; color: #888; margin-top: 20px;">If you have any questions, please contact us at support@yourcompany.com.</p>
                 </div>
             `,
-        });
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log("Email sent:", info.response);
+
         // Optionally, you can also store the OTP code in your database or log it for later verification. 
         return res.status(200).json({ message: "OTP sent successfully Check Your Email... ", otpCode });
 

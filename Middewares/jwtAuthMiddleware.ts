@@ -29,7 +29,7 @@ export const jwtMiddleware = (req: CustomRequest, res: Response, next: NextFunct
         req.user = decoded;
         next();
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         res.status(401).json({ message: "Invalid token" });
     }
 };
