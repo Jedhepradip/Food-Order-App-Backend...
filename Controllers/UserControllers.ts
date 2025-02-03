@@ -38,7 +38,6 @@ cloudinary.config({
 export const SendOTPForRegistrationUser = async (req: Request, res: Response): Promise<any> => {
     try {
         const { email, contact, name } = req.body;
-        console.log("req.body",req.body);
 
         if (!email || !contact || !name) {
             return res.status(400).json({ message: 'All fields are required' });
@@ -102,11 +101,13 @@ export const SendOTPForRegistrationUser = async (req: Request, res: Response): P
             `,
         };
 
-        const info = await transporter.sendMail(mailOptions);
-        console.log("Email sent:", info.response);
-
-        // Optionally, you can also store the OTP code in your database or log it for later verification. 
-        return res.status(200).json({ message: "OTP sent successfully Check Your Email... ", otpCode });
+        try {
+            const info = await transporter.sendMail(mailOptions);
+            console.log(info);
+            return res.status(200).json({ message: "OTP sent successfully Check Your Email... ", otpCode });
+        } catch (error) {
+            console.error("Error sending email:", error);
+        }
 
     } catch (error) {
         console.error(error);
