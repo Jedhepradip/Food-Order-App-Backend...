@@ -102,11 +102,10 @@ export const SendOTPForRegistrationUser = async (req: Request, res: Response): P
         };
 
         try {
-            const info = await transporter.sendMail(mailOptions);
-            console.log(info);
+           await transporter.sendMail(mailOptions);
             return res.status(200).json({ message: "OTP sent successfully Check Your Email... ", otpCode });
         } catch (error) {
-            console.error("Error sending email:", error);
+            return res.status(400).json({ message: "Check Your Internet Connection and try again" });
         }
 
     } catch (error) {
@@ -327,7 +326,8 @@ export const ForgetPassword = async (req: Request, res: Response, next: NextFunc
             // Step 3: Create the password reset link
             const resetLink = `https://cravecourier1.netlify.app/SetNewPassword?token=${token}&email=${encodeURIComponent(email)}`;
 
-            const info = await transporter.sendMail({
+
+            const mailOptions = {
                 from: process.env.FROM,
                 to: email, // Send the email to the user
                 subject: "Password Reset Request - CraveCourier", // Subject line
@@ -358,11 +358,16 @@ export const ForgetPassword = async (req: Request, res: Response, next: NextFunc
                         <p style="font-size: 12px; color: #888; margin-top: 20px; line-height: 1.4;">If you did not request a password reset, please contact us immediately at <a href="mailto:CraveCourier@gmail.com" style="color: #007bff; text-decoration: none;">CraveCourier@gmail.com</a>.</p>
                     </div>
                 `,
-            });
+            }
 
-            return res.status(200).json({
-                message: 'Password reset link has been sent to your email. Please check your inbox to reset your password.', resetLink
-            });
+            try {
+                await transporter.sendMail(mailOptions);
+                return res.status(200).json({
+                    message: 'Password reset link has been sent to your email. Please check your inbox to reset your password.', resetLink
+                });
+            } catch (error) {
+                return res.status(400).json({ message: "Check Your Internet Connection and try again" });
+            }
         }
 
     } catch (error) {

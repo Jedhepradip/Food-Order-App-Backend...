@@ -102,7 +102,7 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
         const estimatedDeliveryDate = new Date(orderDate.getTime() + deliveryTimeToRestaurant * 60000);
         const estimatedDeliveryTime = estimatedDeliveryDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-        const info = await transporter.sendMail({
+        const mailOptions = {
             from: process.env.FROM,
             to: user.email, // Send the email to the user
             subject: `Order Confirmation - ${companyName}`, // Subject line
@@ -145,9 +145,17 @@ export const OrderToMenuPayment = async (req: CustomRequest, res: Response): Pro
                     <p style="font-size: 12px; color: #888; margin-top: 20px;">If you have any questions, please contact us at support@yourcompany.com.</p>
                 </div>
             `,
-        });
+        }
 
-        return res.status(200).json({ id: session.id });
+        try {
+            await transporter.sendMail(mailOptions);
+            return res.status(200).json({ id: session.id });
+            return
+        } catch (error) {
+            res.status(400).json({ message: "Check Your Internet Connection and try again" });
+            return
+        }
+
     } catch (error) {
         console.error("Error creating payment intent:", error);
         return res.status(500).json({ message: "Internal Server Error..." });

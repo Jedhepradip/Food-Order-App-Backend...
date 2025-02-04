@@ -196,7 +196,7 @@ export const statusUpdate = async (req: CustomRequest, res: Response): Promise<v
             },
         });
 
-        const info = await transporter.sendMail({
+        const mailOptions = {
             from: process.env.FROM,
             to: user?.email || "pradipjedhe69@gmail.com", // Send the email to the user's email
             subject: "Menu Details and User Information from CraveCourier!", // Subject line
@@ -238,11 +238,18 @@ export const statusUpdate = async (req: CustomRequest, res: Response): Promise<v
                     <p style="font-size: 12px; color: #888; margin-top: 20px;">If you have any questions, please contact us at support@yourcompany.com.</p>
                 </div>
             `,
-        });
+        }
 
-        await order.save();
-        res.status(200).json({ message: "Order Status Update..." })
-        return
+        try {
+            await order.save();
+            await transporter.sendMail(mailOptions);
+            res.status(200).json({ message: "Order Status Update..." })
+            return
+        } catch (error) {
+            res.status(400).json({ message: "Check Your Internet Connection and try again" });
+            return
+        }
+
     } catch (error) {
         console.log(error);
         res.status(501).json({ message: "Internal Server Error..." })
@@ -359,7 +366,6 @@ export const ClearAllAddToCart = async (req: CustomRequest, res: Response): Prom
 
         // Clear the user's items
         user.items = [];
-
         await user.save();
 
         return res.status(200).json({ message: "All items cleared successfully." });

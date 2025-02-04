@@ -76,7 +76,7 @@ export const PaymentRestaurant = async (req: CustomRequest, res: Response): Prom
         });
 
         // Example Email Send (optional)
-        await transporter.sendMail({
+        const mailOptions = {
             from: process.env.FROM,
             to: userdata?.email, // Replace with user email
             subject: "Payment Confirmation To CraveCouries.com",
@@ -109,10 +109,17 @@ export const PaymentRestaurant = async (req: CustomRequest, res: Response): Prom
         
             PS: Don't forget to follow us on social media for special offers and updates! You can find us on Instagram, Facebook, and Twitter at @CraveCouries.
             `
-        });
+        }
 
-        res.status(200).json({ id: session.id });
-        return
+        try {
+           await transporter.sendMail(mailOptions);         
+            res.status(200).json({ id: session.id });
+            return
+        } catch (error) {
+            res.status(400).json({ message: "Check Your Internet Connection and try again" });
+            return
+        }
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal Server Error" });
@@ -120,7 +127,7 @@ export const PaymentRestaurant = async (req: CustomRequest, res: Response): Prom
 };
 
 export const PaymentGetAllData = async (req: CustomRequest, res: Response): Promise<void> => {
-    try {       
+    try {
         const userID = req.user?.id;
         if (!userID) {
             res.status(401).json({ message: "Unauthorized" });
