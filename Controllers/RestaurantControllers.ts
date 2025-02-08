@@ -9,7 +9,6 @@ import { v2 as cloudinary } from 'cloudinary';
 interface CustomRequest extends Request {
     user?: {
         id: string;  // Define the specific type you expect for 'user.id'
-        // Add other properties if needed
     };
 }
 
